@@ -157,7 +157,7 @@ ClientBin/
 *.dbmdl
 *.dbproj.schemaview
 *.pfx
-*.proto
+Dx.idot.sila2.samples/Protos/*.proto
 *.publishsettings
 node_modules/
 bower_components/

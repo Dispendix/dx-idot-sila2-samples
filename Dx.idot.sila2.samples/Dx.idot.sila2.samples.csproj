@@ -6,15 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
-  <ItemGroup>
-	  <Compile Remove="DLL\**" />
-	  <EmbeddedResource Remove="DLL\**" />
-	  <EmbeddedResource Remove="Features\**" />
-	  <None Remove="DLL\**" />
-  </ItemGroup>
-
-  <Target Name="ProtoPreparation" BeforeTargets="PrepareForBuild">
+	
+	<Target Name="ProtoPreparation" BeforeTargets="PrepareForBuild">
     <Message Text="Copying Base Protos..." Importance="high"></Message>
 
     <Message Text="Started XmlTransformation AbortProcessService.sila.xml -&gt; AbortProcessService.proto" Importance="high"></Message>
