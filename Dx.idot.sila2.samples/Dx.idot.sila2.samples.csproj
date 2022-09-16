@@ -1,0 +1,86 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+	
+	<Target Name="ProtoPreparation" BeforeTargets="PrepareForBuild">
+    <Message Text="Copying Base Protos..." Importance="high"></Message>
+
+    <Message Text="Started XmlTransformation AbortProcessService.sila.xml -&gt; AbortProcessService.proto" Importance="high"></Message>
+    <XslTransformation XslInputPath="xslt\fdl2proto.xsl" XmlInputPaths="Features\AbortProcessService.sila.xml" OutputPaths="Protos\AbortProcessService.proto" />
+    <Message Text="Finished XmlTransformation AbortProcessService.sila.xml -&gt; AbortProcessService.proto" Importance="high"></Message>
+
+    <Message Text="Started XmlTransformation BarcodeReaderService.sila.xml -&gt; BarcodeReaderService.proto" Importance="high"></Message>
+    <XslTransformation XslInputPath="xslt\fdl2proto.xsl" XmlInputPaths="Features\BarcodeReaderService.sila.xml" OutputPaths="Protos\BarcodeReaderService.proto" />
+    <Message Text="Finished XmlTransformation BarcodeReaderService.sila.xml -&gt; BarcodeReaderService.proto" Importance="high"></Message>
+
+    <Message Text="Started XmlTransformation DispensingService.sila.xml -&gt; DispensingService.proto" Importance="high"></Message>
+    <XslTransformation XslInputPath="xslt\fdl2proto.xsl" XmlInputPaths="Features\DispensingService.sila.xml" OutputPaths="Protos\DispensingService.proto" />
+    <Message Text="Finished XmlTransformation DispensingService.sila.xml -&gt; DispensingService.proto" Importance="high"></Message>
+
+    <Message Text="Started XmlTransformation InitializationController.sila.xml -&gt; InitializationController.proto" Importance="high"></Message>
+    <XslTransformation XslInputPath="xslt\fdl2proto.xsl" XmlInputPaths="Features\InitializationController.sila.xml" OutputPaths="Protos\InitializationController.proto" />
+    <Message Text="Finished XmlTransformation InitializationController.sila.xml -&gt; InitializationController.proto" Importance="high"></Message>
+
+    <Message Text="Started XmlTransformation InstrumentStatusProvider.sila.xml -&gt; InstrumentStatusProvider.proto" Importance="high"></Message>
+    <XslTransformation XslInputPath="xslt\fdl2proto.xsl" XmlInputPaths="Features\InstrumentStatusProvider.sila.xml" OutputPaths="Protos\InstrumentStatusProvider.proto" />
+    <Message Text="Finished XmlTransformation InstrumentStatusProvider.sila.xml -&gt; InstrumentStatusProvider.proto" Importance="high"></Message>
+
+
+    <Message Text="Started XmlTransformation PlateMethodService.sila.xml -&gt; PlateMethodService.proto" Importance="high"></Message>
+    <XslTransformation XslInputPath="xslt\fdl2proto.xsl" XmlInputPaths="Features\PlateMethodService.sila.xml" OutputPaths="Protos\PlateMethodService.proto" />
+    <Message Text="Finished XmlTransformation PlateMethodService.sila.xml -&gt; PlateMethodService.proto" Importance="high"></Message>
+
+    <Message Text="Started XmlTransformation ShutdownController.sila.xml -&gt; ShutdownController.proto" Importance="high"></Message>
+    <XslTransformation XslInputPath="xslt\fdl2proto.xsl" XmlInputPaths="Features\ShutdownController.sila.xml" OutputPaths="Protos\ShutdownController.proto" />
+    <Message Text="Finished XmlTransformation ShutdownController.sila.xml -&gt; ShutdownController.proto" Importance="high"></Message>
+
+  </Target>
+
+  <Target Name="ProtoGeneration" DependsOnTargets="ProtoPreparation" AfterTargets="ProtoPreparation">
+    <Message Text="Compiling Protos..." Importance="high"></Message>
+    <ItemGroup>
+      <Protobuf Include="Protos\AbortProcessService.proto" ProtoRoot="Protos\" GrpcServices="Both" OutputDir="Services\" />
+      <Protobuf Include="Protos\BarcodeReaderService.proto" ProtoRoot="Protos\" GrpcServices="Both" OutputDir="Services\" />
+      <Protobuf Include="Protos\DispensingService.proto" ProtoRoot="Protos\" GrpcServices="Both" OutputDir="Services\" />
+      <Protobuf Include="Protos\InitializationController.proto" ProtoRoot="Protos\" GrpcServices="Both" OutputDir="Services\" />
+      <Protobuf Include="Protos\InstrumentStatusProvider.proto" ProtoRoot="Protos\" GrpcServices="Both" OutputDir="Services\" />
+      <Protobuf Include="Protos\PlateMethodService.proto" ProtoRoot="Protos\" GrpcServices="Both" OutputDir="Services\" />
+      <Protobuf Include="Protos\ShutdownController.proto" ProtoRoot="Protos\" GrpcServices="Both" OutputDir="Services\" />
+    </ItemGroup>
+  </Target>
+
+  <ItemGroup>
+    <None Remove="appsettings.json" />
+    <None Remove="C:\Users\MehranAmini\.nuget\packages\sila2.core\6.0.12\contentFiles\any\net6.0\Resources\silacsharp.png" />
+    <None Remove="Resources\TestSila.csv" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\TestSila.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Grpc.AspNetCore" Version="2.46.0" />
+		<PackageReference Include="SiLA2.Client" Version="6.0.1" />
+		<PackageReference Include="SiLA2.Core" Version="6.0.12" />
+		<PackageReference Include="SiLA2.Utils" Version="6.0.6" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Services\" />
+	</ItemGroup>
+
+</Project>

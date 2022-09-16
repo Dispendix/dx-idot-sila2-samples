@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Feature SiLA2Version="1.0" FeatureVersion="1.0" MaturityLevel="Verified" Originator="dx.idot.sila"
+         Category="feature"
+         xmlns="http://www.sila-standard.org"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.sila-standard.org https://gitlab.com/SiLA2/sila_base/raw/master/schema/FeatureDefinition.xsd">
+
+	<Identifier>InstrumentStatusProvider</Identifier>
+	<DisplayName>Instrument Properties Service</DisplayName>
+	<Description>Provider to access properties related to the I.DOT status. This provider can  be used to check the state of the device before executing another command in order ensure proper functioning. It can also be used for maintenance and troubleshooting processes.</Description>
+	<Property>
+		<Identifier>DeviceInputPressure</Identifier>
+		<DisplayName>Device Input Pressure</DisplayName>
+		<Description>
+			Input pressure of the device. A minimum of 2.6 bar is needed for dispensing.
+
+			If the input pressure is below 3 bar and a dispense is started, the device will stay in idle until sufficient input pressure is applied.
+			If the input pressure drops below 2.6 bar during dispense, the dispense will stop and be continued when and if sufficient input pressure is applied.
+		</Description>
+		<Observable>Yes</Observable>
+		<DataType>
+			<Basic>Real</Basic>
+		</DataType>
+	</Property>
+	<Property>
+		<Identifier>InstrumentStatus</Identifier>
+		<DisplayName>Instrument Status</DisplayName>
+		<Description>I.DOT status will be either not initialized, idle, dispensing, or dispensing pause requested. Please note that after initializing the status will be idle, which means the system is ready for any command.</Description>
+		<Observable>No</Observable>
+		<DataType>
+			<Basic>String</Basic>
+		</DataType>
+	</Property>
+</Feature>

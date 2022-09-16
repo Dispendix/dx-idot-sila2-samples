@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Feature SiLA2Version="1.0" FeatureVersion="1.0" MaturityLevel="Verified" Originator="dx.idot.sila"
+         Category="feature"
+         xmlns="http://www.sila-standard.org"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.sila-standard.org https://gitlab.com/SiLA2/sila_base/raw/master/schema/FeatureDefinition.xsd">
+
+	<Identifier>BarcodeReaderService</Identifier>
+	<DisplayName>Barcode Reader Service</DisplayName>
+	<Description>Service to access the barcode reader commands if the I.DOT is equipped with a barcode reader.</Description>
+	<Command>
+		<Identifier>ReadCode</Identifier>
+		<DisplayName>Read Code</DisplayName>
+		<Description>Read the source or target plate barcode.</Description>
+		<Observable>Yes</Observable>
+		<Parameter>
+			<Identifier>PlateTray</Identifier>
+			<DisplayName>PlateTray</DisplayName>
+			<Description>Tray in which the plate to be read is located, either "Target" or "Source".</Description>
+			<DataType>
+				<Constrained>
+					<DataType>
+						<Basic>String</Basic>
+					</DataType>
+					<Constraints>
+						<Set>
+							<Value>BarcodeTarget</Value>
+							<Value>BarcodeSource</Value>
+						</Set>
+					</Constraints>
+				</Constrained>
+			</DataType>
+		</Parameter>
+		<Response>
+			<Identifier>Barcode</Identifier>
+			<DisplayName>Barcode</DisplayName>
+			<Description>Barcode read by the barcode reader.</Description>
+			<DataType>
+				<Basic>String</Basic>
+			</DataType>
+		</Response>
+	</Command>
+	<Property>
+		<Identifier>BarcodeReaderAvailability</Identifier>
+		<DisplayName>Barcode Reader Availability</DisplayName>
+		<Description>Query whether the barcode reader is available or not.</Description>
+		<Observable>No</Observable>
+		<DataType>
+			<Basic>Boolean</Basic>
+		</DataType>
+	</Property>
+
+</Feature>
