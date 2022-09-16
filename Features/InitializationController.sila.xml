@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Feature SiLA2Version="1.0" FeatureVersion="1.0" MaturityLevel="Verified" Originator="dx.idot.sila"
+         Category="feature"
+         xmlns="http://www.sila-standard.org"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.sila-standard.org https://gitlab.com/SiLA2/sila_base/raw/master/schema/FeatureDefinition.xsd">
+
+	<Identifier>InitializationController</Identifier>
+	<DisplayName>Initialization Controller</DisplayName>
+	<Description>Controller to reset and initialize the I.DOT. For the first time, the I.DOT needs to be reset and then initialized. The client is recommended to do the same process when an error happens during another execution.</Description>
+	<Command>
+		<Identifier>Reset</Identifier>
+		<DisplayName>Reset</DisplayName>
+		<Description>Reset the I.DOT.</Description>
+		<Observable>Yes</Observable>
+		<Parameter>
+			<Identifier>SimulationMode</Identifier>
+			<DisplayName>simulation Mode</DisplayName>
+			<Description>State of the I.DOT. True means running I.DOT in simulation mode and false means running the I.DOT with hardware connectivity</Description>
+			<DataType>
+				<Basic>Boolean</Basic>
+			</DataType>
+		</Parameter>
+	</Command>
+	<Command>
+		<Identifier>Initialize</Identifier>
+		<DisplayName>Initialize</DisplayName>
+		<Description>initialize I.DOT instrument.</Description>
+		<Observable>Yes</Observable>
+	</Command>
+</Feature>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Feature SiLA2Version="1.0" FeatureVersion="1.0" MaturityLevel="Verified" Originator="dx.idot.sila"
+         Category="feature"
+         xmlns="http://www.sila-standard.org"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.sila-standard.org https://gitlab.com/SiLA2/sila_base/raw/master/schema/FeatureDefinition.xsd">
+
+	<Identifier>DispensingService</Identifier>
+	<DisplayName>Dispensing Service</DisplayName>
+	<Description>Service to access the dispensing commands of the I.DOT. Please note that the client should insert the respective target and source plates using the PlateLoadingService before dispensing.</Description>
+	<Command>
+		<Identifier>DispenseProtocol</Identifier>
+		<DisplayName>Dispense Protocol</DisplayName>
+		<Description>Dispenses a CSV protocol located on the I.DOT's hard drive or is accessible by the I.DOT software through a connected network drive.</Description>
+		<Observable>Yes</Observable>
+		<Parameter>
+			<Identifier>FilenamePath</Identifier>
+			<DisplayName>Filename Path</DisplayName>
+			<Description>Full local path to a CSV protocol. The *.csv file must adhere to the I.DOT CSV format. All used liquids, liquid classes, and plate formats must be present on the I.DOT.</Description>
+			<DataType>
+				<Basic>String</Basic>
+			</DataType>
+		</Parameter>
+	</Command>
+	<Command>
+		<Identifier>TransferLiquid</Identifier>
+		<DisplayName>Transfer Liquid</DisplayName>
+		<Description>
+			Dispense a predefined volume from a predefined source to a predefined destination on the target plate in x-y coordinates. This command provides more low-level access to the dispensing capabilities of the device than the Dispense Protocol Command.
+			IMPORTANT! This command enables direct control of the axis movement and can thereby cause damage if used without thorough understanding of the device, and careful testing. We recommend to use DispenseProtocol for most users.
+			Please refer to the SiLA 2 Automation Guide to learn more how to use this command.
+		</Description>
+		<Observable>Yes</Observable>
+		<Parameter>
+			<Identifier>XmlTransferSchema</Identifier>
+			<DisplayName>Xml Transfer Schema</DisplayName>
+			<Description>Xml formatted array of SiLA parameter set which describes the transfer schema.Please refer to the API Automation document for more information.</Description>
+			<DataType>
+				<Basic>String</Basic>
+			</DataType>
+		</Parameter>
+		<Parameter>
+			<Identifier>AllowListOrderOptimization</Identifier>
+			<DisplayName>Allow List Order Optimization</DisplayName>
+			<Description>Optimize list order to minimize positioning effort and use parallel dispensing.</Description>
+			<DataType>
+				<Basic>Boolean</Basic>
+			</DataType>
+		</Parameter>
+	</Command>
+</Feature>

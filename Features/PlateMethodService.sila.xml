@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Feature SiLA2Version="1.0" FeatureVersion="1.0" MaturityLevel="Verified" Originator="dx.idot.sila"
+         Category="feature"
+         xmlns="http://www.sila-standard.org"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.sila-standard.org https://gitlab.com/SiLA2/sila_base/raw/master/schema/FeatureDefinition.xsd">
+
+	<Identifier>PlateMethodService</Identifier>
+	<DisplayName>Plate Method Service</DisplayName>
+	<Description>Service to eject and retract both source and target plates. This service is needed to input the respective target and source plates before dispensing. Please note that canceling this service in the middle of execution can cause the carrier to half eject or half retract. The dispensing process needs all carriers to be fully retracted to avoid any harm to the I.DOT.</Description>
+	<Command>
+		<Identifier>EjectCarrier</Identifier>
+		<DisplayName>Eject Carrier</DisplayName>
+		<Description>Eject the I.DOT's source plate carrier or target plate carrier.</Description>
+		<Observable>Yes</Observable>
+		<Parameter>
+			<Identifier>PlateCarrier</Identifier>
+			<DisplayName>PlateCarrier</DisplayName>
+			<Description>Type of carrier, either target or source.</Description>
+			<DataType>
+				<DataTypeIdentifier>PlateCarrier</DataTypeIdentifier>
+			</DataType>
+		</Parameter>
+	</Command>
+	<Command>
+		<Identifier>RetractCarrier</Identifier>
+		<DisplayName>Retract Carrier</DisplayName>
+		<Description>Retracts both source and target carriers.</Description>
+		<Observable>Yes</Observable>
+	</Command>
+	<DataTypeDefinition>
+		<Identifier>PlateCarrier</Identifier>
+		<DisplayName>Plate Carrier</DisplayName>
+		<Description>Type of the carrier, either target or source.</Description>
+		<DataType>
+			<Constrained>
+				<DataType>
+					<Basic>String</Basic>
+				</DataType>
+				<Constraints>
+					<Set>
+						<Value>Target</Value>
+						<Value>Source</Value>
+					</Set>
+				</Constraints>
+			</Constrained>
+		</DataType>
+	</DataTypeDefinition>
+</Feature>
