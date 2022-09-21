@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<Feature SiLA2Version="1.0" FeatureVersion="1.0" MaturityLevel="Verified" Originator="dx.idot.sila"
-         Category="feature"
+<Feature SiLA2Version="1.0" FeatureVersion="1.0" MaturityLevel="Draft" Originator="dx.idot.sila"
+         Category="dispensing"
          xmlns="http://www.sila-standard.org"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://www.sila-standard.org https://gitlab.com/SiLA2/sila_base/raw/master/schema/FeatureDefinition.xsd">
 
 	<Identifier>InstrumentStatusProvider</Identifier>
-	<DisplayName>Instrument Properties Service</DisplayName>
+	<DisplayName>Instrument Status Provider</DisplayName>
 	<Description>Provider to access properties related to the I.DOT status. This provider can  be used to check the state of the device before executing another command in order ensure proper functioning. It can also be used for maintenance and troubleshooting processes.</Description>
 	<Property>
 		<Identifier>DeviceInputPressure</Identifier>

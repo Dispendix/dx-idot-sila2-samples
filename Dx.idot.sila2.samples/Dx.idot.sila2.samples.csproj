@@ -10,9 +10,9 @@
 	<Target Name="ProtoPreparation" BeforeTargets="PrepareForBuild">
     <Message Text="Copying Base Protos..." Importance="high"></Message>
 
-    <Message Text="Started XmlTransformation AbortProcessService.sila.xml -&gt; AbortProcessService.proto" Importance="high"></Message>
-    <XslTransformation XslInputPath="xslt\fdl2proto.xsl" XmlInputPaths="Features\AbortProcessService.sila.xml" OutputPaths="Protos\AbortProcessService.proto" />
-    <Message Text="Finished XmlTransformation AbortProcessService.sila.xml -&gt; AbortProcessService.proto" Importance="high"></Message>
+    <Message Text="Started XmlTransformation AbortProcessController.sila.xml -&gt; AbortProcessController.proto" Importance="high"></Message>
+    <XslTransformation XslInputPath="xslt\fdl2proto.xsl" XmlInputPaths="Features\AbortProcessController.sila.xml" OutputPaths="Protos\AbortProcessController.proto" />
+    <Message Text="Finished XmlTransformation AbortProcessController.sila.xml -&gt; AbortProcessController.proto" Importance="high"></Message>
 
     <Message Text="Started XmlTransformation BarcodeReaderService.sila.xml -&gt; BarcodeReaderService.proto" Importance="high"></Message>
     <XslTransformation XslInputPath="xslt\fdl2proto.xsl" XmlInputPaths="Features\BarcodeReaderService.sila.xml" OutputPaths="Protos\BarcodeReaderService.proto" />
@@ -31,9 +31,9 @@
     <Message Text="Finished XmlTransformation InstrumentStatusProvider.sila.xml -&gt; InstrumentStatusProvider.proto" Importance="high"></Message>
 
 
-    <Message Text="Started XmlTransformation PlateMethodService.sila.xml -&gt; PlateMethodService.proto" Importance="high"></Message>
-    <XslTransformation XslInputPath="xslt\fdl2proto.xsl" XmlInputPaths="Features\PlateMethodService.sila.xml" OutputPaths="Protos\PlateMethodService.proto" />
-    <Message Text="Finished XmlTransformation PlateMethodService.sila.xml -&gt; PlateMethodService.proto" Importance="high"></Message>
+    <Message Text="Started XmlTransformation PlateTrayController.sila.xml -&gt; PlateTrayController.proto" Importance="high"></Message>
+    <XslTransformation XslInputPath="xslt\fdl2proto.xsl" XmlInputPaths="Features\PlateTrayController.sila.xml" OutputPaths="Protos\PlateTrayController.proto" />
+    <Message Text="Finished XmlTransformation PlateTrayController.sila.xml -&gt; PlateTrayController.proto" Importance="high"></Message>
 
     <Message Text="Started XmlTransformation ShutdownController.sila.xml -&gt; ShutdownController.proto" Importance="high"></Message>
     <XslTransformation XslInputPath="xslt\fdl2proto.xsl" XmlInputPaths="Features\ShutdownController.sila.xml" OutputPaths="Protos\ShutdownController.proto" />
@@ -44,12 +44,12 @@
   <Target Name="ProtoGeneration" DependsOnTargets="ProtoPreparation" AfterTargets="ProtoPreparation">
     <Message Text="Compiling Protos..." Importance="high"></Message>
     <ItemGroup>
-      <Protobuf Include="Protos\AbortProcessService.proto" ProtoRoot="Protos\" GrpcServices="Both" OutputDir="Services\" />
+      <Protobuf Include="Protos\AbortProcessController.proto" ProtoRoot="Protos\" GrpcServices="Both" OutputDir="Services\" />
       <Protobuf Include="Protos\BarcodeReaderService.proto" ProtoRoot="Protos\" GrpcServices="Both" OutputDir="Services\" />
       <Protobuf Include="Protos\DispensingService.proto" ProtoRoot="Protos\" GrpcServices="Both" OutputDir="Services\" />
       <Protobuf Include="Protos\InitializationController.proto" ProtoRoot="Protos\" GrpcServices="Both" OutputDir="Services\" />
       <Protobuf Include="Protos\InstrumentStatusProvider.proto" ProtoRoot="Protos\" GrpcServices="Both" OutputDir="Services\" />
-      <Protobuf Include="Protos\PlateMethodService.proto" ProtoRoot="Protos\" GrpcServices="Both" OutputDir="Services\" />
+      <Protobuf Include="Protos\PlateTrayController.proto" ProtoRoot="Protos\" GrpcServices="Both" OutputDir="Services\" />
       <Protobuf Include="Protos\ShutdownController.proto" ProtoRoot="Protos\" GrpcServices="Both" OutputDir="Services\" />
     </ItemGroup>
   </Target>

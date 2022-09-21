@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<Feature SiLA2Version="1.0" FeatureVersion="1.0" MaturityLevel="Verified" Originator="dx.idot.sila"
-         Category="feature"
+<Feature SiLA2Version="1.0" FeatureVersion="1.0" MaturityLevel="Draft" Originator="dx.idot.sila"
+         Category="dispensing"
          xmlns="http://www.sila-standard.org"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://www.sila-standard.org https://gitlab.com/SiLA2/sila_base/raw/master/schema/FeatureDefinition.xsd">
@@ -15,13 +15,16 @@
 		<Description>Dispenses a CSV protocol located on the I.DOT's hard drive or is accessible by the I.DOT software through a connected network drive.</Description>
 		<Observable>Yes</Observable>
 		<Parameter>
-			<Identifier>FilenamePath</Identifier>
-			<DisplayName>Filename Path</DisplayName>
+			<Identifier>FileNamePath</Identifier>
+			<DisplayName>File Name Path</DisplayName>
 			<Description>Full local path to a CSV protocol. The *.csv file must adhere to the I.DOT CSV format. All used liquids, liquid classes, and plate formats must be present on the I.DOT.</Description>
 			<DataType>
 				<Basic>String</Basic>
 			</DataType>
 		</Parameter>
+		<DefinedExecutionErrors>
+			<Identifier>InvalidFileNamePath</Identifier>
+		</DefinedExecutionErrors>
 	</Command>
 	<Command>
 		<Identifier>TransferLiquid</Identifier>
@@ -49,4 +52,10 @@
 			</DataType>
 		</Parameter>
 	</Command>
+	<DefinedExecutionError>
+		<Identifier>InvalidFileNamePath</Identifier>
+		<DisplayName>Invalid File Name Path</DisplayName>
+		<Description>Protocol file not found.</Description>
+	</DefinedExecutionError>
+
 </Feature>

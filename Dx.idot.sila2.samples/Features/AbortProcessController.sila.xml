@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<Feature SiLA2Version="1.0" FeatureVersion="1.0" MaturityLevel="Verified" Originator="dx.idot.sila"
-         Category="feature"
+<Feature SiLA2Version="1.0" FeatureVersion="1.0" MaturityLevel="Draft" Originator="dx.idot.sila"
+         Category="dispensing"
          xmlns="http://www.sila-standard.org"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://www.sila-standard.org https://gitlab.com/SiLA2/sila_base/raw/master/schema/FeatureDefinition.xsd">
 
-	<Identifier>AbortProcessService</Identifier>
-	<DisplayName>Abort Process Service</DisplayName>
-	<Description>Service to access the abort commands on I.DOT.</Description>
+	<Identifier>AbortProcessController</Identifier>
+	<DisplayName>Abort Process Controller</DisplayName>
+	<Description>Controller to execute the abort commands on the I.DOT.</Description>
 	<Command>
 		<Identifier>AbortProcess</Identifier>
 		<DisplayName>Abort Process</DisplayName>
