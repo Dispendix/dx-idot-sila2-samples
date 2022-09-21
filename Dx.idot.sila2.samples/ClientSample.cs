@@ -3,13 +3,13 @@ using Grpc.Net.Client;
 using Microsoft.Extensions.Configuration;
 using Sila2.Org.Silastandard;
 using SiLA2.Utils.gRPC;
-using AbortController = Sila2.Dx.Idot.Sila.Feature.Abortprocessservice.V1;
-using BarcodeReader = Sila2.Dx.Idot.Sila.Feature.Barcodereaderservice.V1;
-using DispensingService = Sila2.Dx.Idot.Sila.Feature.Dispensingservice.V1;
-using InitializationController = Sila2.Dx.Idot.Sila.Feature.Initializationcontroller.V1;
-using InstrumentMaintenanceService = Sila2.Dx.Idot.Sila.Feature.Instrumentstatusprovider.V1;
-using PlateLoadingController = Sila2.Dx.Idot.Sila.Feature.Platemethodservice.V1;
-using ShutdownController = Sila2.Dx.Idot.Sila.Feature.Shutdowncontroller.V1;
+using Abortprocesscontroller = Sila2.Dx.Idot.Sila.Dispensing.Abortprocesscontroller.V1;
+using Barcodereaderservice = Sila2.Dx.Idot.Sila.Dispensing.Barcodereaderservice.V1;
+using DispensingService = Sila2.Dx.Idot.Sila.Dispensing.Dispensingservice.V1;
+using InitializationController = Sila2.Dx.Idot.Sila.Dispensing.Initializationcontroller.V1;
+using Instrumentstatusprovider = Sila2.Dx.Idot.Sila.Dispensing.Instrumentstatusprovider.V1;
+using PlateLoadingController = Sila2.Dx.Idot.Sila.Dispensing.Platetraycontroller.V1;
+using ShutdownController = Sila2.Dx.Idot.Sila.Dispensing.Shutdowncontroller.V1;
 using SiLAService = Sila2.Org.Silastandard.Core.Silaservice.V1;
 
 using Boolean = Sila2.Org.Silastandard.Boolean;
@@ -22,10 +22,10 @@ public class ClientSample
     // Definition of all ávailable IDOT API client service
     private readonly DispensingService.DispensingService.DispensingServiceClient _dispensingServiceClient;
     private readonly InitializationController.InitializationController.InitializationControllerClient _initializationControllerClient;
-    private readonly AbortController.AbortProcessService.AbortProcessServiceClient _abortProcessServiceClient;
-    private readonly BarcodeReader.BarcodeReaderService.BarcodeReaderServiceClient _barcodeReaderServiceClient;
-    private readonly InstrumentMaintenanceService.InstrumentStatusProvider.InstrumentStatusProviderClient _instrumentStatusProviderClient;
-    private readonly PlateLoadingController.PlateMethodService.PlateMethodServiceClient _plateMethodServiceClient;
+    private readonly Abortprocesscontroller.AbortProcessController.AbortProcessControllerClient _abortProcessControllerClient;
+    private readonly Barcodereaderservice.BarcodeReaderService.BarcodeReaderServiceClient _barcodeReaderServiceClient;
+    private readonly Instrumentstatusprovider.InstrumentStatusProvider.InstrumentStatusProviderClient _instrumentStatusProviderClient;
+    private readonly PlateLoadingController.PlateTrayController.PlateTrayControllerClient _plateTrayControllerClient;
     private readonly ShutdownController.ShutdownController.ShutdownControllerClient _shutdownControllerClient;
     private readonly ErrorRecoveryService.ErrorRecoveryServiceClient _errorRecoveryClient;
     private readonly SiLAService.SiLAService.SiLAServiceClient _siLAServiceClient;
@@ -40,10 +40,10 @@ public class ClientSample
         // Initialize client services
         _initializationControllerClient = new InitializationController.InitializationController.InitializationControllerClient(serverChannel);
         _dispensingServiceClient = new DispensingService.DispensingService.DispensingServiceClient(serverChannel);
-        _abortProcessServiceClient = new AbortController.AbortProcessService.AbortProcessServiceClient(serverChannel);
-        _barcodeReaderServiceClient = new BarcodeReader.BarcodeReaderService.BarcodeReaderServiceClient(serverChannel);
-        _instrumentStatusProviderClient = new InstrumentMaintenanceService.InstrumentStatusProvider.InstrumentStatusProviderClient(serverChannel);
-        _plateMethodServiceClient = new PlateLoadingController.PlateMethodService.PlateMethodServiceClient(serverChannel);
+        _abortProcessControllerClient = new Abortprocesscontroller.AbortProcessController.AbortProcessControllerClient(serverChannel);
+        _barcodeReaderServiceClient = new Barcodereaderservice.BarcodeReaderService.BarcodeReaderServiceClient(serverChannel);
+        _instrumentStatusProviderClient = new Instrumentstatusprovider.InstrumentStatusProvider.InstrumentStatusProviderClient(serverChannel);
+        _plateTrayControllerClient = new PlateLoadingController.PlateTrayController.PlateTrayControllerClient(serverChannel);
         _shutdownControllerClient = new ShutdownController.ShutdownController.ShutdownControllerClient(serverChannel);
         _errorRecoveryClient = new ErrorRecoveryService.ErrorRecoveryServiceClient(serverChannel);
 
@@ -52,7 +52,7 @@ public class ClientSample
         Console.WriteLine($"Server Service Version: {serverVersion}");
 
         // Initialize device and execute sample protocol
-        InitIDotDevice(false).Wait();
+        InitIDotDevice().Wait();
         DispenseProtocol(filePath).Wait();
     }
 
@@ -148,7 +148,7 @@ public class ClientSample
         try
         {
             var instrumentStatus =
-                _instrumentStatusProviderClient.Get_InstrumentStatus(new InstrumentMaintenanceService.Get_InstrumentStatus_Parameters());
+                _instrumentStatusProviderClient.Get_InstrumentStatus(new Instrumentstatusprovider.Get_InstrumentStatus_Parameters());
             if (instrumentStatus.InstrumentStatus.Value != "Idle")
             {
                 Console.ForegroundColor = ConsoleColor.DarkMagenta;
@@ -160,7 +160,7 @@ public class ClientSample
             CommandExecutionUUID? commandID = _dispensingServiceClient
                                               .DispenseProtocol(new DispensingService.DispenseProtocol_Parameters()
                                               {
-                                                  FilenamePath = new Sila2.Org.Silastandard.String() { Value = filePath }
+                                                  FileNamePath = new Sila2.Org.Silastandard.String() { Value = filePath }
                                               })
                                               .CommandExecutionUUID;
 

@@ -1,22 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<Feature SiLA2Version="1.0" FeatureVersion="1.0" MaturityLevel="Verified" Originator="dx.idot.sila"
-         Category="feature"
+<Feature SiLA2Version="1.0" FeatureVersion="1.0" MaturityLevel="Draft" Originator="dx.idot.sila"
+         Category="dispensing"
          xmlns="http://www.sila-standard.org"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://www.sila-standard.org https://gitlab.com/SiLA2/sila_base/raw/master/schema/FeatureDefinition.xsd">
 
 	<Identifier>BarcodeReaderService</Identifier>
 	<DisplayName>Barcode Reader Service</DisplayName>
-	<Description>Service to access the barcode reader commands if the I.DOT is equipped with a barcode reader.</Description>
+	<Description>Service to read a barcode from a SBS format plate that has been placed in either the source tray or the target tray.
+
+		Reading barcodes with this feature is possible only if the I.DOT is equipped with a barcode reader. This can be checked via the property Barcode Reader Availability.
+		To sucessfully read a barcode, it must be positioned correctly on the plate, and the plate must be oriented in the tray so that the barcode is facing the barcode reader.
+	</Description>
 	<Command>
-		<Identifier>ReadCode</Identifier>
-		<DisplayName>Read Code</DisplayName>
+		<Identifier>ReadBarcodeOnPlate</Identifier>
+		<DisplayName>Read Barcode On Plate</DisplayName>
 		<Description>Read the source or target plate barcode.</Description>
 		<Observable>Yes</Observable>
 		<Parameter>
 			<Identifier>PlateTray</Identifier>
-			<DisplayName>PlateTray</DisplayName>
+			<DisplayName>Plate Tray</DisplayName>
 			<Description>Tray in which the plate to be read is located, either "Target" or "Source".</Description>
 			<DataType>
 				<Constrained>
