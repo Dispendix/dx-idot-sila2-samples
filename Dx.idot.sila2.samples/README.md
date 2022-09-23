@@ -2,27 +2,25 @@
 In this section, the process of the development of simple I.DOT console client application is described. This tutorial shows the necessary steps for implementing your own I.DOT client in C#.
 
 ## General Remarks
-
 The connection to the I.DOT SiLA 2 server instrument should be implemented following the SiLA implementation guidelines. The I.DOT SiLA 2 server only supports client-initiated connection method. This means that the client should initiate the connection to the I.DOT SiLA 2 server. 
 Any scheduler software, PMS (process management software), or LIMS (laboratory information management system) that complies with SiLA 2 standards can connect with the I.DOT SiLA 2 server. SiLA 2 runs over HTTP/2 connection. Therefore, this connection should use an internet or local DHCP connection with a router. The user has to connect  a client software that follows the SiLA 2 client implementations. As of 2021/02/17, the SiLA 2 consortium provides client implementations and SDKs in some popular programming languages such as:
-•Java
-•C#
-•Python
+•	Java
+•	C#
+•	Python
 A SiLA 2 client can connect by entering an IP address or with SiLA server discovery. Server discovery is the easiest way for a client to access the I.DOT instrument. The server discovery feature uses multicast DNS messaging (mDNS) with the service name _sila._tcp.
- .
 
 
 ## Prerequisites
 •	Visual Studio 2019
 ## Project Setup
-1.Create a net6.0 console or form app project.
-2.Install the SiLA2.Client, SiLA2.Core, SiLA2.Utils, Grpc.AspNetCore packages. These packages are available in the https://api.nuget.org/v3/index.json repository.
+1.	Create a net6.0 console or form app project.
+2.	Install the SiLA2.Client, SiLA2.Core, SiLA2.Utils, Grpc.AspNetCore packages. These packages are available in the https://api.nuget.org/v3/index.json repository.
 
 
 ![image](https://user-images.githubusercontent.com/63784771/191930390-ea17d80c-b59b-499d-abb8-95ae00915775.png)
 
  
-## Build gRPC glue codes  
+## Build gRPC glue code
 1.	Add all I.DOT’s feature definition language (FDL) *.sila.xml files into your project. They are:
 a.	AbortProcessService.sila.xml
 b.	BarcodeReaderService.sila.xml
@@ -87,12 +85,12 @@ i.	SiLAService.sila.xml
     </ItemGroup>
   </Target>
 ```
-
 3.	Build your client project. Sila2.Tools library to generate all required glue code for gRPC 
 
 ## Create I.DOT Client
 Create a class containing all gRPC service clients from the I.DOT. Clients which are all generated with the same gRPC channel, an abstraction of long-lived connections to the remote server.  You can use the following code to create a simple sample connection. 
 This sample code contains all functionality and steps such as connecting to a server, Initializing a device and executing a protocol. Each section has been described and commented on inside the code.
+
 ```
 using Grpc.Net.Client;
 using Microsoft.Extensions.Configuration;
@@ -259,15 +257,15 @@ public class ClientSample
 }
 
 ```
-
 In this sample we have two different commands
 
 ## Observable Command
 An observable command is a command with information data that can be streamed during execution. It is translated to a server streaming RPC. A server-streaming RPC is similar to a unary RPC, except that the server returns a stream of messages in response to a client’s request. The client completes once it receives all the server’s messages. Each command has three functions:
 
-•	SilaCommandName: The first function has the same name as theof command. This command runs the main function asyncronothly asynchronously and returns a CommandExecutionUUID output.  This output contains a GUID number that can be used to query the command status and result.
-•	** SilaCommandName **_Info: By calling this function, you can haveCall this function to obtain the current execution status.
-•	** SilaCommandName **_Result: The first part means the primary function name. By calling this function, you canCall this function to fetch the main function result.
+•	SilaCommandName: The first function has the same name as the command. This command runs the main function asynchronously and returns a CommandExecutionUUID output. This output contains a GUID that can be used to query the command status and result.
+•	** SilaCommandName **_Info: Call this function to obtain the current execution status.
+•	** SilaCommandName **_Result: Call this function to fetch the function result.
+
 
 ```
 public virtual grpc::AsyncUnaryCall<global::Sila2.Org.Silastandard.CommandConfirmation> TransferLiquidSiLAAsync(global::Sila2.Dx.Idot.Sila.Feature.Dispensingservice.V1.TransferLiquidSiLA_Parameters request, grpc::CallOptions options)
@@ -277,8 +275,8 @@ public virtual grpc::AsyncServerStreamingCall<global::Sila2.Org.Silastandard.Exe
 public virtual global::Sila2.Dx.Idot.Sila.Feature.Dispensingservice.V1.TransferLiquidSiLA_Responses TransferLiquidSiLA_Result(global::Sila2.Org.Silastandard.CommandExecutionUUID request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
 ```
 
-## Non-Ot observable Command
-A non-observablen inobservable command is an RPC that will return immediately without streaming data during invocation. Since it is a command without features like an observable command, itIt  has a simpler implementation on the client -side.
+## Non-Observable Command
+A non-observablecommand is an RPC that will return immediately without streaming data during invocation. It  has a simpler implementation on the client side.
 
 ```
 public virtual Get_ServerName_Responses Get_ServerName(
@@ -290,5 +288,5 @@ public virtual Get_ServerName_Responses Get_ServerName(
  
 
 ## SiLA 2 Library
-For more information about SiLA 2 library, please go to the SiLA 2 official page and SILA 2 Csharp Library.
+For more information about SiLA 2 library, please go to the [SiLA 2 official page](https://gitlab.com/SiLA2) and [SILA 2 Csharp Librar](https://gitlab.com/SiLA2/sila_csharp)y.
 
