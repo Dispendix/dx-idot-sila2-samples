@@ -57,7 +57,12 @@
   <ItemGroup>
     <None Remove="appsettings.json" />
     <None Remove="C:\Users\MehranAmini\.nuget\packages\sila2.core\6.0.12\contentFiles\any\net6.0\Resources\silacsharp.png" />
+    <None Remove="README.md" />
     <None Remove="Resources\TestSila.csv" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="README.md" />
   </ItemGroup>
 
   <ItemGroup>
