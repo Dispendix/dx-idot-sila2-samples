@@ -19,16 +19,7 @@ In this section, the process of the development of simple I.DOT console client a
 
  
 ## Build gRPC glue code
-1.	Add all I.DOT’s feature definition language (FDL) *.sila.xml files into your project. They are:
-a.	AbortProcessService.sila.xml
-b.	BarcodeReaderService.sila.xml
-c.	DispensingService.sila.xml
-d.	InitializationService.sila.xml
-e.	InstrumentPropertiesService.sila.xml
-f.	PlateLoadingController.sila.xml
-g.	PlateMethodService.sila.xml
-h.	ShutdownService.sila.xml
-i.	SiLAService.sila.xml
+1.	Add all or required part of I.DOT’s feature definition language (FDL) *.sila.xml files from the Features folder into your project.
 2.	Define added FDL files as SilaFeature inside your *.csproj project file.
 
 ```
@@ -87,174 +78,9 @@ i.	SiLAService.sila.xml
 
 ## Create I.DOT Client
 Create a class containing all gRPC service clients from the I.DOT. Clients which are all generated with the same gRPC channel, an abstraction of long-lived connections to the remote server.  You can use the following code to create a simple sample connection. 
-This sample code contains all functionality and steps such as connecting to a server, Initializing a device and executing a protocol. Each section has been described and commented on inside the code.
+This sample code contains ClientSample.cs class with all functionality and steps such as connecting to a server, Initializing a device and executing a protocol. Each section has been described and commented on inside the code.
 
-```
-using Grpc.Net.Client;
-using Microsoft.Extensions.Configuration;
-using Sila2.Org.Silastandard;
-using SiLA2.Utils.gRPC;
-using AbortController = Sila2.Dx.Idot.Sila.Feature.Abortprocessservice.V1;
-using BarcodeReader = Sila2.Dx.Idot.Sila.Feature.Barcodereaderservice.V1;
-using DispensingService = Sila2.Dx.Idot.Sila.Feature.Dispensingservice.V1;
-using InitializationController = Sila2.Dx.Idot.Sila.Feature.Initializationservice.V1;
-using InstrumentMaintenanceService = Sila2.Dx.Idot.Sila.Feature.Instrumentpropertiesservice.V1;
-using PlateLoadingController = Sila2.Dx.Idot.Sila.Feature.Platemethodservice.V1;
-using ShutdownController = Sila2.Dx.Idot.Sila.Feature.Shutdownservice.V1;
-using SiLAService = Sila2.Org.Silastandard.Core.Silaservice.V1;
 
-using Boolean = Sila2.Org.Silastandard.Boolean;
-using Microsoft.Extensions.DependencyInjection;
-
-public class ClientSample
-{
-    // Definition of all ávailable IDOT API client service
-    private readonly DispensingService.DispensingService.DispensingServiceClient _dispensingServiceClient;
-    private readonly InitializationController.InitializationService.InitializationServiceClient _initializationServiceClient;
-    private readonly AbortController.AbortProcessService.AbortProcessServiceClient _abortProcessServiceClient;
-    private readonly BarcodeReader.BarcodeReaderService.BarcodeReaderServiceClient _barcodeReaderServiceClient;
-    private readonly InstrumentMaintenanceService.InstrumentPropertiesService.InstrumentPropertiesServiceClient _instrumentPropertiesServiceClient;
-    private readonly PlateLoadingController.PlateMethodService.PlateMethodServiceClient _plateMethodServiceClient;
-    private readonly ShutdownController.ShutdownService.ShutdownServiceClient _shutdownServiceClient;
-    private readonly SiLAService.SiLAService.SiLAServiceClient _siLAServiceClient;
-    private static IConfigurationRoot _configuration;
-
-    public ClientSample()
-    {
-        // Sample csv protocol
-        string filePath = $"{AppDomain.CurrentDomain.BaseDirectory}Resources{Path.DirectorySeparatorChar}TestSila.csv";
-        GrpcChannel serverChannel = FindServerChannel().Result;
-
-        // Initialize client services
-        _initializationServiceClient = new InitializationController.InitializationService.InitializationServiceClient(serverChannel);
-        _dispensingServiceClient = new DispensingService.DispensingService.DispensingServiceClient(serverChannel);
-        _abortProcessServiceClient = new AbortController.AbortProcessService.AbortProcessServiceClient(serverChannel);
-        _barcodeReaderServiceClient = new BarcodeReader.BarcodeReaderService.BarcodeReaderServiceClient(serverChannel);
-        _instrumentPropertiesServiceClient = new InstrumentMaintenanceService.InstrumentPropertiesService.InstrumentPropertiesServiceClient(serverChannel);
-        _plateMethodServiceClient = new PlateLoadingController.PlateMethodService.PlateMethodServiceClient(serverChannel);
-        _shutdownServiceClient = new ShutdownController.ShutdownService.ShutdownServiceClient(serverChannel);
-        _siLAServiceClient = new SiLAService.SiLAService.SiLAServiceClient(serverChannel);
-
-        // Initialize device and execute sample protocol
-        InitIDotDevice().Wait();
-        DispenseProtocol(filePath);
-    }
-
-    /// <summary>
-    /// This function is responsible for finding the server. By calling SearchForServers function it tries to discover the server first,
-    /// and if a server doesn’t detect will try to connect to the server with the IP and port by calling GetChannel SiLA 2 function.
-    /// </summary>
-    /// <returns></returns>
-    internal async Task<GrpcChannel> FindServerChannel()
-    {
-        GrpcChannel serverChannel;
-
-        IConfigurationBuilder? configBuilder = new ConfigurationBuilder()
-                                               .SetBasePath(Directory.GetCurrentDirectory())
-                                               .AddJsonFile("appsettings.json", true, true);
-        _configuration = configBuilder.Build();
-        string? fqhn = _configuration["Connection:FQHN"];
-        int port = int.Parse(_configuration["Connection:Port"]);
-
-        var clientSetup = new SiLA2.Client.Configurator(_configuration);
-        Console.WriteLine("Starting Server Discovery...");
-
-        var serverMap = await clientSetup.SearchForServers();
-
-        var serverType = "IDot SiLA2 Server";
-        var server = serverMap.Values.FirstOrDefault(x => x.Info.Type == serverType);
-        if (server != null)
-        {
-            Console.WriteLine($"Connecting to {server}");
-            serverChannel = server.Channel;
-        }
-        else
-        {
-            Console.WriteLine($"No connection automatically discovered. Using Server-URI '{fqhn}:{port}' from appSettings.config");
-            serverChannel = await clientSetup.ServiceProvider.GetService<IGrpcChannelProvider>()?.GetChannel(fqhn, port, true)!;
-        }
-
-        return serverChannel;
-    }
-
-    /// <summary>
-    /// This is a helper function to query and wait for a execution command
-    /// </summary>
-    /// <param name="executionInfo">main executed command stream info output</param>
-    /// <returns></returns>
-    protected async Task WaitForExecutionCommend(AsyncServerStreamingCall<ExecutionInfo> executionInfo)
-    {
-        IAsyncStreamReader<ExecutionInfo>? responseStream = executionInfo.ResponseStream;
-        while (await responseStream.MoveNext(new CancellationToken()))
-        {
-            if (responseStream.Current.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedSuccessfully ||
-	                responseStream.Current.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedWithError)
-	            {
-	                break;
-	            }
-	        }
-	    }
-	
-	}
-	    
-	/// <summary>
-	/// The IDOT device must be restarted after connecting API to the service and initialize the IDOT device to prepare it for executing a protocol
-	/// </summary>
-	/// <param name="simulationMod">Switch server to the simulation mod</param>
-	/// <returns></returns>
-	public async Task InitIDotDevice(bool simulationMod = true)
-	{
-		CommandConfirmation? commandReset =
-			_initializationServiceClient.Reset(new InitializationController.Reset_Parameters { SimulationMode = new Boolean { Value = simulationMod } });
-
-		await WaitForExecutionCommend(_initializationServiceClient.Reset_Info(commandReset.CommandExecutionUUID));
-
-		CommandConfirmation? commandInitialize = _initializationServiceClient.Initialize(new InitializationController.Initialize_Parameters());
-		await WaitForExecutionCommend(_initializationServiceClient.Initialize_Info(commandInitialize.CommandExecutionUUID));
-	}
-
-	/// <summary>
-	/// Dispense a CSV protcol
-	/// </summary>
-	/// <param name="filePath">CSV protocol file path. This file should exist on the server side</param>
-	public async void DispenseProtocol(string filePath)
-	{
-		//This command runs asynchronously. To query the result or get the execution status you can use the return Command Execution UUID
-		CommandExecutionUUID? commandID = _dispensingServiceClient
-										  .DispenseProtocol(new DispensingService.DispenseProtocol_Parameters()
-										  {
-											  FilenamePath = new Sila2.Org.Silastandard.String() { Value = filePath }
-										  })
-										  .CommandExecutionUUID;
-
-		// Wait for command execution to finish
-		using (AsyncServerStreamingCall<ExecutionInfo>? call = _dispensingServiceClient.DispenseProtocol_Info(commandID))
-		{
-			IAsyncStreamReader<ExecutionInfo>? responseStream = call.ResponseStream;
-			while (await responseStream.MoveNext())
-			{
-				// Query the dispense progress status and display it in the console
-				ExecutionInfo? currentExecutionInfo = responseStream.Current;
-				string? message =
-					$"--> Command ControlTemperature    -status: {currentExecutionInfo.CommandStatus}   -remaining time: {currentExecutionInfo.EstimatedRemainingTime?.Seconds,3:###}s    -progress: {currentExecutionInfo.ProgressInfo.Value}";
-				Console.ForegroundColor = ConsoleColor.DarkMagenta;
-				Console.WriteLine(message);
-
-				if (currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedSuccessfully ||
-					currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedWithError)
-				{
-					break;
-				}
-			}
-
-			Console.ForegroundColor = ConsoleColor.Gray;
-			Console.Write("\n");
-		}
-
-	}
-}
-
-```
 In this sample we have two different commands
 
 ## Observable Command
@@ -266,11 +92,11 @@ An observable command is a command with information data that can be streamed du
 
 
 ```
-public virtual grpc::AsyncUnaryCall<global::Sila2.Org.Silastandard.CommandConfirmation> TransferLiquidSiLAAsync(global::Sila2.Dx.Idot.Sila.Feature.Dispensingservice.V1.TransferLiquidSiLA_Parameters request, grpc::CallOptions options)
- 
-public virtual grpc::AsyncServerStreamingCall<global::Sila2.Org.Silastandard.ExecutionInfo> TransferLiquidSiLA_Info(global::Sila2.Org.Silastandard.CommandExecutionUUID request, grpc::CallOptions options)
- 
-public virtual global::Sila2.Dx.Idot.Sila.Feature.Dispensingservice.V1.TransferLiquidSiLA_Responses TransferLiquidSiLA_Result(global::Sila2.Org.Silastandard.CommandExecutionUUID request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+TransferLiquidSiLAAsync
+
+TransferLiquidSiLA_Info
+
+TransferLiquidSiLA_Result
 ```
 
 ## Non-Observable Command
@@ -285,6 +111,6 @@ public virtual Get_ServerName_Responses Get_ServerName(
 ```
  
 
-## SiLA 2 Library
+## About the SiLA 2 library
 For more information about SiLA 2 library, please go to the [SiLA 2 official page](https://gitlab.com/SiLA2) and [SILA 2 Csharp Library](https://gitlab.com/SiLA2/sila_csharp).
 
