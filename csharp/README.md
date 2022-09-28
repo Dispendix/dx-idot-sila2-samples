@@ -1,3 +1,8 @@
+#I.DOT SiLA2 Samples C#
+
+I.DOT C# SiLA 2 console sample
+
+
 ## Purpose
 
 This is a simple C# console application for the I.DOT device to show how developers can connect to the I.DOT SiLA 2 service and call the API functionality remotely.
@@ -5,20 +10,19 @@ This is a simple C# console application for the I.DOT device to show how develop
 ## Getting started
 
 The project has no additional prerequisites. Open Dx.IDot.Sila2.Samples.sln to get started.
+Prerequisites (Recommended):
+- Visual Studio 2019 or higher
 
-## New I.DOT SiLA 2 Client Development Tutorial
+## Clinet implimentation guid
 
 In this section, the process of the development of simple I.DOT console client application is described. This tutorial shows the necessary steps for implementing your own I.DOT client in C#.
 
-## Prerequisites (Recommended)
 
-• Visual Studio 2019 or higher
-
-## Project Setup
+### Project Setup
 
 Refer to `Dx.IDot.SiLA2.Samples.csproj` for target framework and required NuGet packages.
 
-## Build gRPC glue code
+### Build gRPC glue code
 
 1. Add the feature definition language (FDL) \*.sila.xml files from the Features folder into your project.
 2. Add the required boilerplate code for transforming the FDL files to .proto files, e.g.:
@@ -51,13 +55,13 @@ Refer to `Dx.IDot.SiLA2.Samples.csproj` for target framework and required NuGet 
 
 Refer to `Dx.IDot.SiLA2.Samples.csproj` for an example implementation of these build steps.
 
-## Create I.DOT Client
+### Create I.DOT Client
 
 Refer to `ClientSample.cs` to see an example implementation of steps such as connecting to a server, Initializing a device and executing a protocol.
 
 In this sample we have two different commands
 
-## Observable Command
+#### Observable Command
 
 An observable command is a command with information data that can be streamed during execution. It is translated to a server-streaming RPC. A server-streaming RPC is similar to a unary RPC, except that the server returns a stream of messages in response to a client’s request. The client completes once it receives all the server’s messages. Each command has three functions:
 
@@ -73,7 +77,7 @@ TransferLiquidSiLA_Info
 TransferLiquidSiLA_Result
 ```
 
-## Non-Observable Command
+#### Non-Observable Command
 
 A non-observablecommand is an RPC that will return immediately without streaming data during invocation. It has a simpler implementation on the client side.
 

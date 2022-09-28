@@ -1,4 +1,4 @@
-﻿namespace Dx.idot.sila2.samples
+﻿namespace IDot.SiLA2.Samples.CSharp
 {
     public class Program
     {
