@@ -64,9 +64,9 @@ In this sample we have two different commands
 
 An observable command is a command with information data that can be streamed during execution. It is translated to a server-streaming RPC. A server-streaming RPC is similar to a unary RPC, except that the server returns a stream of messages in response to a client’s request. The client completes once it receives all the server’s messages. Each command has three functions:
 
-• SilaCommandName: The first function has the same name as the command. This command runs the main function asynchronously and returns a CommandExecutionUUID output. This output contains a GUID that can be used to query the command status and result.
-• ** SilaCommandName **\_Info: Call this function to obtain the current execution status.
-• ** SilaCommandName **\_Result: Call this function to fetch the function result.
+- SilaCommandName: The first function has the same name as the command. This command runs the main function asynchronously and returns a CommandExecutionUUID output. This output contains a GUID that can be used to query the command status and result.
+- ** SilaCommandName **\_Info: Call this function to obtain the current execution status.
+- ** SilaCommandName **\_Result: Call this function to fetch the function result.
 
 ```
 TransferLiquidSiLAAsync
