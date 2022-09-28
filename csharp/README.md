@@ -1,6 +1,4 @@
-#I.DOT SiLA2 Samples C#
-
-I.DOT C# SiLA 2 console sample
+# I.DOT SiLA2 Samples C#
 
 
 ## Purpose
@@ -10,6 +8,7 @@ This is a simple C# console application for the I.DOT device to show how develop
 ## Getting started
 
 The project has no additional prerequisites. Open Dx.IDot.Sila2.Samples.sln to get started.
+
 Prerequisites (Recommended):
 - Visual Studio 2019 or higher
 
