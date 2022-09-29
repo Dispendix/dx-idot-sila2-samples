@@ -1,5 +1,6 @@
 # I.DOT SiLA2 Samples C#
 
+This code is licensed under MIT-0.
 
 ## Purpose
 
