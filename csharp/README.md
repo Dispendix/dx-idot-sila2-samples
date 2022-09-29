@@ -3,7 +3,7 @@
 
 ## Purpose
 
-This is a simple C# console application for the I.DOT device to show how developers can connect to the I.DOT SiLA 2 service and call the API functionality remotely.
+This is a simple C# console application that implements the I.DOT SiLA 2 API. It can serve as a working example to better understand how the API can be communicated with, or as a starting point for a complete project.
 
 ## Getting started
 
