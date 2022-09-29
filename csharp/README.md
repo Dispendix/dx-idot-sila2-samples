@@ -12,7 +12,7 @@ The project has no additional prerequisites. Open Dx.IDot.Sila2.Samples.sln to g
 Prerequisites (Recommended):
 - Visual Studio 2019 or higher
 
-## Clinet implimentation guid
+## Client Implementation Guide
 
 In this section, the process of the development of simple I.DOT console client application is described. This tutorial shows the necessary steps for implementing your own I.DOT client in C#.
 
