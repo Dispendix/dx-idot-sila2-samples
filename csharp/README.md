@@ -1,4 +1,4 @@
-# I.DOT SiLA2 Samples C#
+# I.DOT SiLA 2 C# Sample
 
 This code is licensed under MIT-0.
 
