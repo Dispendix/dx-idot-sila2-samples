@@ -175,7 +175,7 @@ public class ClientSample
                     // Query the dispense progress status and display it in the console
                     ExecutionInfo? currentExecutionInfo = responseStream.Current;
                     string? message =
-                        $"--> Command ControlTemperature    -status: {currentExecutionInfo.CommandStatus}   -remaining time: {currentExecutionInfo.EstimatedRemainingTime?.Seconds,3:###}s    -progress: {currentExecutionInfo.ProgressInfo.Value}";
+                        $"--> Command DispenseProtocol    -status: {currentExecutionInfo.CommandStatus}   -remaining time: {currentExecutionInfo.EstimatedRemainingTime?.Seconds,3:###}s    -progress: {currentExecutionInfo.ProgressInfo.Value}";
                     Console.ForegroundColor = ConsoleColor.DarkMagenta;
                     Console.WriteLine(message);
 
