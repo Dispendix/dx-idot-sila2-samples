@@ -8,15 +8,11 @@ This is a simple C# console application that implements the I.DOT SiLA 2 API. It
 
 ## Getting started
 
-The project has no additional prerequisites. Open Dx.IDot.Sila2.Samples.sln to get started.
-
-Prerequisites (Recommended):
-- Visual Studio 2019 or higher
+Visual Studio 2019 or higher is recommended. The project has no additional prerequisites. Open Dx.IDot.Sila2.Samples.sln to get started.
 
 ## Client Implementation Guide
 
-In this section, the process of the development of simple I.DOT console client application is described. This tutorial shows the necessary steps for implementing your own I.DOT client in C#.
-
+This tutorial covers the necessary steps for implementing an I.DOT SiLA 2 client in C#.
 
 ### Project Setup
 
@@ -27,7 +23,7 @@ Refer to `Dx.IDot.SiLA2.Samples.csproj` for target framework and required NuGet 
 1. Add the feature definition language (FDL) \*.sila.xml files from the Features folder into your project.
 2. Add the required boilerplate code for transforming the FDL files to .proto files, e.g.:
 
-```
+```xml
   <Target Name="ProtoPreparation" BeforeTargets="PrepareForBuild">
     <Message Text="Copying Base Protos..." Importance="high"></Message>
 
@@ -40,7 +36,7 @@ Refer to `Dx.IDot.SiLA2.Samples.csproj` for target framework and required NuGet 
 
 3. Add the same for the generation of service classes from the resulting .proto files, e.g.:
 
-```
+```xml
   <Target Name="ProtoGeneration" DependsOnTargets="ProtoPreparation" AfterTargets="ProtoPreparation">
     <Message Text="Compiling Protos..." Importance="high"></Message>
     <ItemGroup>
@@ -59,7 +55,7 @@ Refer to `Dx.IDot.SiLA2.Samples.csproj` for an example implementation of these b
 
 Refer to `ClientSample.cs` to see an example implementation of steps such as connecting to a server, Initializing a device and executing a protocol.
 
-In this sample we have two different commands
+In this sample there are two different commands
 
 #### Observable Command
 
@@ -69,19 +65,21 @@ An observable command is a command with information data that can be streamed du
 - ** SilaCommandName **\_Info: Call this function to obtain the current execution status.
 - ** SilaCommandName **\_Result: Call this function to fetch the function result.
 
-```
-TransferLiquidSiLAAsync
+Example:
+ ```csharp
+_dispensingServiceClient.DispenseProtocol
 
-TransferLiquidSiLA_Info
+_dispensingServiceClient.DispenseProtocol_Info
 
-TransferLiquidSiLA_Result
+_dispensingServiceClient.DispenseProtocol_Result
 ```
 
 #### Non-Observable Command
 
 A non-observablecommand is an RPC that will return immediately without streaming data during invocation. It has a simpler implementation on the client side.
 
-```
+Example:
+```csharp
 public virtual Get_ServerName_Responses Get_ServerName(
     Get_ServerName_Parameters request,
     Grpc.Core.Metadata headers = null,
