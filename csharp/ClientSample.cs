@@ -72,7 +72,7 @@ public class ClientSample
         string? fqhn = _configuration["Connection:FQHN"];
         int port = int.Parse(_configuration["Connection:Port"]);
 
-        var clientSetup = new SiLA2.Client.Configurator(_configuration);
+        var clientSetup = new SiLA2.Client.Configurator(_configuration, new string[] {});
         Console.WriteLine("Starting Server Discovery...");
 
         var serverMap = await clientSetup.SearchForServers();

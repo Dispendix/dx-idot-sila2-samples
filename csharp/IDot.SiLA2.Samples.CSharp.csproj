@@ -72,10 +72,10 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Grpc.AspNetCore" Version="2.46.0" />
-		<PackageReference Include="SiLA2.Client" Version="6.0.1" />
-		<PackageReference Include="SiLA2.Core" Version="6.0.12" />
-		<PackageReference Include="SiLA2.Utils" Version="6.0.6" />
+		<PackageReference Include="Grpc.AspNetCore" Version="2.50.0-pre1" />
+		<PackageReference Include="SiLA2.Client" Version="6.3.9" />
+		<PackageReference Include="SiLA2.Core" Version="6.3.9" />
+		<PackageReference Include="SiLA2.Utils" Version="6.3.9" />
 	</ItemGroup>
 
 	<ItemGroup>
