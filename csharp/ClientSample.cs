@@ -186,6 +186,7 @@ public class ClientSample
                     }
                 }
             }
+            
 
             _dispensingServiceClient.DispenseProtocol_Result(commandID);
         }
