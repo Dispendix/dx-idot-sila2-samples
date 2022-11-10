@@ -123,12 +123,18 @@ public class ClientSample
             CommandConfirmation? commandReset =
                 _initializationControllerClient.Reset(new InitializationController.Reset_Parameters { SimulationMode = new Boolean { Value = simulationMod } });
 
-            await WaitForExecutionCommend(_initializationControllerClient.Reset_Info(commandReset.CommandExecutionUUID));
-            _initializationControllerClient.Reset_Result(commandReset.CommandExecutionUUID);
+            using (AsyncServerStreamingCall<ExecutionInfo>? call = _initializationControllerClient.Reset_Info(commandReset.CommandExecutionUUID))
+            {
+                await WaitForExecutionCommend(call);
+                _initializationControllerClient.Reset_Result(commandReset.CommandExecutionUUID);
+            }
 
             CommandConfirmation? commandInitialize = _initializationControllerClient.Initialize(new InitializationController.Initialize_Parameters());
-            await WaitForExecutionCommend(_initializationControllerClient.Initialize_Info(commandInitialize.CommandExecutionUUID));
-            _initializationControllerClient.Initialize_Result(commandInitialize.CommandExecutionUUID);
+            using (AsyncServerStreamingCall<ExecutionInfo>? call = _initializationControllerClient.Initialize_Info(commandInitialize.CommandExecutionUUID))
+            {
+                await WaitForExecutionCommend(call);
+                _initializationControllerClient.Initialize_Result(commandInitialize.CommandExecutionUUID);
+            }
         }
         catch (Exception e)
         {

@@ -17,7 +17,7 @@ SiLA 2 runs over HTTP/2. Therefore, an internet connection or local DHCP with a 
 - Python
 - C++
 
-A SiLA 2 client can connect either by providing an IP address or with SiLA server discovery. Server discovery is the easiest way for a client to access the I.DOT instrument. The server discovery feature uses multicast DNS messaging (mDNS) with the service name **\_sila.\_tcp**.
+A SiLA 2 client can connect either by specifing the I.DOT SiLA 2 Server's IP address or through the SiLA server discovery. Server discovery is the easiest way for a client to access the I.DOT instrument. The server discovery feature uses multicast DNS messaging (mDNS) with the service name **\_sila.\_tcp**.
 
 ## SiLA 2 Library
 
