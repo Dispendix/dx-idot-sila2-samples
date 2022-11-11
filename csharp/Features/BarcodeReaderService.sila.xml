@@ -16,7 +16,7 @@
 	<Command>
 		<Identifier>ReadBarcodeOnPlate</Identifier>
 		<DisplayName>Read Barcode On Plate</DisplayName>
-		<Description>Read the source or target plate barcode.</Description>
+		<Description>Read the source or target plate barcode. To use this feature, make sure the I.DOT instrument has the barcode reader component installed.</Description>
 		<Observable>Yes</Observable>
 		<Parameter>
 			<Identifier>PlateTray</Identifier>
@@ -48,7 +48,7 @@
 	<Property>
 		<Identifier>BarcodeReaderAvailability</Identifier>
 		<DisplayName>Barcode Reader Availability</DisplayName>
-		<Description>Query whether the barcode reader is available or not.</Description>
+		<Description>Query whether the barcode reader is available or not. This property reflects the state of the "UseBarcodeReader" property in the I.DOT Assay Studio configuration file. This property can be changed in the general settings of I.DOT Assay Studio and requires the barcode reader component to be installed in the device to be set to TRUE.</Description>
 		<Observable>No</Observable>
 		<DataType>
 			<Basic>Boolean</Basic>

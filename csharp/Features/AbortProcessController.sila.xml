@@ -12,7 +12,7 @@
 	<Command>
 		<Identifier>AbortProcess</Identifier>
 		<DisplayName>Abort Process</DisplayName>
-		<Description>Abort all running processes.</Description>
+		<Description>Aborts the currently running command or processes of the device, e.g. a dispense or a tray ejection/retraction. If there are no errors after the execution of AbortProcess, the device is idle and accepts new commands.</Description>
 		<Observable>No</Observable>
 	</Command>
 </Feature>
