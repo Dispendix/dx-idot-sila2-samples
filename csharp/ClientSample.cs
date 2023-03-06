@@ -34,8 +34,8 @@ public class ClientSample
     public ClientSample()
     {
         // Sample csv protocol
-        string filePath = $"{AppDomain.CurrentDomain.BaseDirectory}Resources{Path.DirectorySeparatorChar}TestSila.csv";
-        //string filePath = "C:\\Users\\ValentinBusch\\I-DOT Assay Studio\\Protocols\\Test CSV LIMS.csv";
+        // string filePath = $"{AppDomain.CurrentDomain.BaseDirectory}Resources{Path.DirectorySeparatorChar}TestSila.csv";
+        string filePath = "C:\\Users\\ValentinBusch\\I-DOT Assay Studio\\Protocols\\Test CSV Normal.csv";
         GrpcChannel serverChannel = FindServerChannel().Result;
 
         // Initialize client services
@@ -152,24 +152,25 @@ public class ClientSample
     /// <param name="filePath">CSV protocol file path. This file should exist on the server side</param>
     public async Task DispenseProtocol(string filePath)
     {
+        Console.ForegroundColor = ConsoleColor.DarkMagenta;
         try
         {
-            var instrumentStatus =
+            var instrumentStatusInitial =
                 _instrumentStatusProviderClient.Get_InstrumentStatus(new Instrumentstatusprovider.Get_InstrumentStatus_Parameters());
-            if (instrumentStatus.InstrumentStatus.Value != "Idle")
+            if (instrumentStatusInitial.InstrumentStatus.Value != "Idle")
             {
-                Console.ForegroundColor = ConsoleColor.DarkMagenta;
                 Console.WriteLine("I.DOT to execute a protocol  should be in the Idle state.");
                 return;
             }
 
             //This command runs asynchronously. To query the result or get the execution status you can use the return Command Execution UUID
-            CommandExecutionUUID? commandID = _dispensingServiceClient
+            CommandExecutionUUID? DispenseCommandID = _dispensingServiceClient
                                               .DispenseProtocol(new DispensingService.DispenseProtocol_Parameters()
                                               {
                                                   FileNamePath = new Sila2.Org.Silastandard.String() { Value = filePath }
                                               })
                                               .CommandExecutionUUID;
+            Console.WriteLine("Sent DispenseProtocol Command.");
 
             ////This command runs asynchronously. To query the result or get the execution status you can use the return Command Execution UUID
             //CommandExecutionUUID? commandID1 = _dispensingServiceClient
@@ -179,39 +180,54 @@ public class ClientSample
             //                                  })
             //                                  .CommandExecutionUUID;
 
-            try
+            //try
+            //{
+            //    while (true)
+            //    {
+            //        var instrumentStatus1 =
+            //            _instrumentStatusProviderClient.Get_InstrumentStatus(
+            //                new Instrumentstatusprovider.Get_InstrumentStatus_Parameters());
+            //        if (instrumentStatus1.InstrumentStatus.Value != "Idle")
+            //        {
+            //            Console.ForegroundColor = ConsoleColor.DarkMagenta;
+            //            Console.WriteLine("I.DOT to execute a protocol  should be in the Idle state.");
+            //        }
+            //        else
+            //        {
+            //            break;
+            //        }
+
+            //        Thread.Sleep(10);
+
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    Console.WriteLine(ex.ToString());
+            //}
+
+            Thread.Sleep(1000);
+
+            var instrumentStatusDuringDispense =
+                _instrumentStatusProviderClient.Get_InstrumentStatus(
+                    new Instrumentstatusprovider.Get_InstrumentStatus_Parameters());
+
+            if (instrumentStatusDuringDispense.InstrumentStatus.Value != "Idle")
             {
-                while (true)
-                {
-                    var instrumentStatus1 =
-                        _instrumentStatusProviderClient.Get_InstrumentStatus(
-                            new Instrumentstatusprovider.Get_InstrumentStatus_Parameters());
-                    if (instrumentStatus1.InstrumentStatus.Value != "Idle")
-                    {
-                        Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                        Console.WriteLine("I.DOT to execute a protocol  should be in the Idle state.");
-                    }
-                    else
-                    {
-                        break;
-                    }
-
-                    Thread.Sleep(10);
-
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
+                Console.WriteLine("The I.DOT is still busy dispensing the protocol. Aborting dispensing...");
+                _abortProcessControllerClient.AbortProcess(new Abortprocesscontroller.AbortProcess_Parameters());
             }
 
-            Thread.Sleep(2000);
+            Thread.Sleep(1000);
 
-            _abortProcessControllerClient.AbortProcess(new Abortprocesscontroller.AbortProcess_Parameters());
+            var instrumentStatusAfterAbort =
+                _instrumentStatusProviderClient.Get_InstrumentStatus(
+                    new Instrumentstatusprovider.Get_InstrumentStatus_Parameters());
+            Console.WriteLine("The new device status after abort is: " + instrumentStatusAfterAbort.InstrumentStatus.Value.ToString());
 
 
             // Wait for command execution to finish
-            using (AsyncServerStreamingCall<ExecutionInfo>? call = _dispensingServiceClient.DispenseProtocol_Info(commandID))
+            using (AsyncServerStreamingCall<ExecutionInfo>? call = _dispensingServiceClient.DispenseProtocol_Info(DispenseCommandID))
             {
                 IAsyncStreamReader<ExecutionInfo>? responseStream = call.ResponseStream;
                 var cancellationToken = new CancellationTokenSource();
@@ -222,7 +238,6 @@ public class ClientSample
                     ExecutionInfo? currentExecutionInfo = responseStream.Current;
                     string? message =
                         $"--> Command DispenseProtocol    -status: {currentExecutionInfo.CommandStatus}   -remaining time: {currentExecutionInfo.EstimatedRemainingTime?.Seconds,3:###}s    -progress: {currentExecutionInfo.ProgressInfo.Value}";
-                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
                     Console.WriteLine(message);
 
                     if (currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedSuccessfully ||
@@ -234,7 +249,7 @@ public class ClientSample
             }
 
 
-            _dispensingServiceClient.DispenseProtocol_Result(commandID);
+            _dispensingServiceClient.DispenseProtocol_Result(DispenseCommandID);
         }
         catch (Exception e)
         {
