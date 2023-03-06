@@ -35,6 +35,7 @@ public class ClientSample
     {
         // Sample csv protocol
         string filePath = $"{AppDomain.CurrentDomain.BaseDirectory}Resources{Path.DirectorySeparatorChar}TestSila.csv";
+        //string filePath = "C:\\Users\\ValentinBusch\\I-DOT Assay Studio\\Protocols\\Test CSV LIMS.csv";
         GrpcChannel serverChannel = FindServerChannel().Result;
 
         // Initialize client services
@@ -170,41 +171,47 @@ public class ClientSample
                                               })
                                               .CommandExecutionUUID;
 
-            //This command runs asynchronously. To query the result or get the execution status you can use the return Command Execution UUID
-            CommandExecutionUUID? commandID1 = _dispensingServiceClient
-                                              .DispenseProtocol(new DispensingService.DispenseProtocol_Parameters()
-                                              {
-                                                  FileNamePath = new Sila2.Org.Silastandard.String() { Value = filePath }
-                                              })
-                                              .CommandExecutionUUID;
+            ////This command runs asynchronously. To query the result or get the execution status you can use the return Command Execution UUID
+            //CommandExecutionUUID? commandID1 = _dispensingServiceClient
+            //                                  .DispenseProtocol(new DispensingService.DispenseProtocol_Parameters()
+            //                                  {
+            //                                      FileNamePath = new Sila2.Org.Silastandard.String() { Value = filePath }
+            //                                  })
+            //                                  .CommandExecutionUUID;
 
-            while (true)
+            try
             {
-                var instrumentStatus1 =
-                    _instrumentStatusProviderClient.Get_InstrumentStatus(new Instrumentstatusprovider.Get_InstrumentStatus_Parameters());
-                if (instrumentStatus1.InstrumentStatus.Value != "Idle")
+                while (true)
                 {
-                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                    Console.WriteLine("I.DOT to execute a protocol  should be in the Idle state.");
+                    var instrumentStatus1 =
+                        _instrumentStatusProviderClient.Get_InstrumentStatus(
+                            new Instrumentstatusprovider.Get_InstrumentStatus_Parameters());
+                    if (instrumentStatus1.InstrumentStatus.Value != "Idle")
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                        Console.WriteLine("I.DOT to execute a protocol  should be in the Idle state.");
+                    }
+                    else
+                    {
+                        break;
+                    }
+
+                    Thread.Sleep(10);
+
                 }
-                else
-                {
-                    break;
-                }
-                Thread.Sleep(1000);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
             }
 
-            //This command runs asynchronously. To query the result or get the execution status you can use the return Command Execution UUID
-            CommandExecutionUUID? commandID2 = _dispensingServiceClient
-                .DispenseProtocol(new DispensingService.DispenseProtocol_Parameters()
-                {
-                    FileNamePath = new Sila2.Org.Silastandard.String() { Value = filePath }
-                })
-                .CommandExecutionUUID;
+            Thread.Sleep(2000);
+
+            _abortProcessControllerClient.AbortProcess(new Abortprocesscontroller.AbortProcess_Parameters());
 
 
             // Wait for command execution to finish
-            using (AsyncServerStreamingCall<ExecutionInfo>? call = _dispensingServiceClient.DispenseProtocol_Info(commandID2))
+            using (AsyncServerStreamingCall<ExecutionInfo>? call = _dispensingServiceClient.DispenseProtocol_Info(commandID))
             {
                 IAsyncStreamReader<ExecutionInfo>? responseStream = call.ResponseStream;
                 var cancellationToken = new CancellationTokenSource();
