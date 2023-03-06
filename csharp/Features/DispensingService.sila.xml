@@ -24,6 +24,23 @@
 		</Parameter>
 		<DefinedExecutionErrors>
 			<Identifier>InvalidFileNamePath</Identifier>
+			<Identifier>InvalidCSVProtocol</Identifier>
+			<Identifier>InvalidCSVProtocolSettings</Identifier>
+			<Identifier>MoreThanOneSourcePlateDetected</Identifier>
+			<Identifier>MoreThanOneTargetPlateDetected</Identifier>
+			<Identifier>NoSourcePlateDetected</Identifier>
+			<Identifier>NoTargetPlateDetected</Identifier>
+			<Identifier>UnsupportedSourcePlate</Identifier>
+			<Identifier>UnsupportedTargetPlate</Identifier>
+			<Identifier>NoSourcePlateInPlateFormatLibrary</Identifier>
+			<Identifier>NoTargetPlateInPlateFormatLibrary</Identifier>
+			<Identifier>NoLiquidClassInLiquidClassLibrary</Identifier>
+			<Identifier>OutOfBoundSourcePlateRow</Identifier>
+			<Identifier>OutOfBoundTargetPlateRow</Identifier>
+			<Identifier>OutOfBoundSourcePlateColumn</Identifier>
+			<Identifier>OutOfBoundTargetPlateColumn</Identifier>
+			<Identifier>OutOfBoundDispenseVolume</Identifier>
+			<Identifier>TransferLiquidFailed</Identifier>
 		</DefinedExecutionErrors>
 	</Command>
 	<Command>
@@ -38,7 +55,7 @@
 		<Parameter>
 			<Identifier>XmlTransferSchema</Identifier>
 			<DisplayName>Xml Transfer Schema</DisplayName>
-			<Description>Xml formatted array of SiLA parameter set which describes the transfer schema.Please refer to the API Automation document for more information.</Description>
+			<Description>Xml formatted array of SiLA parameter set which describes the transfer schema. Please refer to the API Automation document for more information.</Description>
 			<DataType>
 				<Basic>String</Basic>
 			</DataType>
@@ -51,11 +68,141 @@
 				<Basic>Boolean</Basic>
 			</DataType>
 		</Parameter>
+		<DefinedExecutionErrors>
+			<Identifier>IncompatibleState</Identifier>
+			<Identifier>InvalidTrasnferXMLSchema</Identifier>
+			<Identifier>EmptySiLADispensingSteps</Identifier>
+			<Identifier>UnsupportedSourcePlate</Identifier>
+			<Identifier>MoreThanOneSourcePlateDetected</Identifier>
+			<Identifier>NoSourcePlateDetected</Identifier>
+			<Identifier>NoLiquidClassInLiquidClassLibrary</Identifier>
+			<Identifier>NoLiquidClass</Identifier>
+			<Identifier>OutOfBoundSourcePlateRow</Identifier>
+			<Identifier>OutOfBoundSourcePlateColumn</Identifier>
+			<Identifier>OutOfBoundDispenseVolume</Identifier>
+			<Identifier>OutOfBoundTargetPlateXPosition</Identifier>
+			<Identifier>OutOfBoundTargetPlateYPosition</Identifier>
+			<Identifier>TransferLiquidFailed</Identifier>
+		</DefinedExecutionErrors>
 	</Command>
+	<DefinedExecutionError>
+		<Identifier>IncompatibleState</Identifier>
+		<DisplayName>Incompatible State</DisplayName>
+		<Description>I.DOT device must be in the Idle state to execute a command.</Description>
+	</DefinedExecutionError>
 	<DefinedExecutionError>
 		<Identifier>InvalidFileNamePath</Identifier>
 		<DisplayName>Invalid File Name Path</DisplayName>
 		<Description>Protocol file not found.</Description>
 	</DefinedExecutionError>
-
+	<DefinedExecutionError>
+		<Identifier>InvalidCSVProtocol</Identifier>
+		<DisplayName>Invalid CSV Protocol</DisplayName>
+		<Description>Could not parse CSV protocol.</Description>
+	</DefinedExecutionError>
+	<DefinedExecutionError>
+		<Identifier>InvalidCSVProtocolSettings</Identifier>
+		<DisplayName>Invalid CSV Protocol Settings</DisplayName>
+		<Description>Could not parse CSV protocol settings.</Description>
+	</DefinedExecutionError>
+	<DefinedExecutionError>
+		<Identifier>MoreThanOneSourcePlateDetected</Identifier>
+		<DisplayName>More Than One Source Plate Detected</DisplayName>
+		<Description>More than one source plate detected. Split the protocol to protocols with one source plate each.</Description>
+	</DefinedExecutionError>
+	<DefinedExecutionError>
+		<Identifier>MoreThanOneTargetPlateDetected</Identifier>
+		<DisplayName>More Than One Target Plate Detected</DisplayName>
+		<Description>More than one target plate detected. Split the protocol to protocols with one target plate each.</Description>
+	</DefinedExecutionError>
+	<DefinedExecutionError>
+		<Identifier>NoSourcePlateDetected</Identifier>
+		<DisplayName>No Source Plate Detected</DisplayName>
+		<Description>No source plate detected.</Description>
+	</DefinedExecutionError>
+	<DefinedExecutionError>
+		<Identifier>NoTargetPlateDetected</Identifier>
+		<DisplayName>No Target Plate Detected</DisplayName>
+		<Description>No target plate detected.</Description>
+	</DefinedExecutionError>
+	<DefinedExecutionError>
+		<Identifier>UnsupportedSourcePlate</Identifier>
+		<DisplayName>Unsupported Source Plate</DisplayName>
+		<Description>The source plate format is unsupported.</Description>
+	</DefinedExecutionError>
+	<DefinedExecutionError>
+		<Identifier>UnsupportedTargetPlate</Identifier>
+		<DisplayName>Unsupported Target Plate</DisplayName>
+		<Description>The target plate format is unsupported.</Description>
+	</DefinedExecutionError>
+	<DefinedExecutionError>
+		<Identifier>NoSourcePlateInPlateFormatLibrary</Identifier>
+		<DisplayName>No Source Plate In Plate Format Library</DisplayName>
+		<Description>Source plate was not found in Plate Format Library.</Description>
+	</DefinedExecutionError>
+	<DefinedExecutionError>
+		<Identifier>NoTargetPlateInPlateFormatLibrary</Identifier>
+		<DisplayName>No Target Plate In Plate Format Library</DisplayName>
+		<Description>Target plate was not found in Plate Format Library.</Description>
+	</DefinedExecutionError>
+	<DefinedExecutionError>
+		<Identifier>NoLiquidClassInLiquidClassLibrary</Identifier>
+		<DisplayName>No Liquid Class In Liquid Class Library</DisplayName>
+		<Description>Liquid class was not found in Liquid Class Library.</Description>
+	</DefinedExecutionError>
+	<DefinedExecutionError>
+		<Identifier>OutOfBoundSourcePlateRow</Identifier>
+		<DisplayName>Out Of Bound Source Plate Row</DisplayName>
+		<Description>Source plate row is either negative or greater than the number of available source plate rows.</Description>
+	</DefinedExecutionError>
+	<DefinedExecutionError>
+		<Identifier>OutOfBoundTargetPlateRow</Identifier>
+		<DisplayName>Out Of Bound Target Plate Row</DisplayName>
+		<Description>Target plate row is either negative or greater than the number of available target plate rows.</Description>
+	</DefinedExecutionError>
+	<DefinedExecutionError>
+		<Identifier>OutOfBoundSourcePlateColumn</Identifier>
+		<DisplayName>Out Of Bound Source Plate Column</DisplayName>
+		<Description>Source plate column is either negative or greater than the number of available source plate columns.</Description>
+	</DefinedExecutionError>
+	<DefinedExecutionError>
+		<Identifier>OutOfBoundTargetPlateColumn</Identifier>
+		<DisplayName>Out Of Bound Target Plate Column</DisplayName>
+		<Description>Target plate column is either negative or greater than the number of available target plate columns.</Description>
+	</DefinedExecutionError>
+	<DefinedExecutionError>
+		<Identifier>OutOfBoundDispenseVolume</Identifier>
+		<DisplayName>Out Of Bound Dispense Volume</DisplayName>
+		<Description>Dispense volume is either negative or zero.</Description>
+	</DefinedExecutionError>
+	<DefinedExecutionError>
+		<Identifier>TransferLiquidFailed</Identifier>
+		<DisplayName>Transfer Liquid Failed</DisplayName>
+		<Description>Error when trying to dispense liquid.</Description>
+	</DefinedExecutionError>
+	<DefinedExecutionError>
+		<Identifier>InvalidTrasnferXMLSchema</Identifier>
+		<DisplayName>Invalid Trasnfer XML Schema</DisplayName>
+		<Description>Invalid transfer XML schema.</Description>
+	</DefinedExecutionError>
+	<DefinedExecutionError>
+		<Identifier>EmptySiLADispensingSteps</Identifier>
+		<DisplayName>Empty SiLA Dispensing Steps</DisplayName>
+		<Description>No SiLA dispensing steps in the transfer XML.</Description>
+	</DefinedExecutionError>
+	<DefinedExecutionError>
+		<Identifier>NoLiquidClass</Identifier>
+		<DisplayName>No Liquid Class</DisplayName>
+		<Description>No liquid class found.</Description>
+	</DefinedExecutionError>
+	<DefinedExecutionError>
+		<Identifier>OutOfBoundTargetPlateXPosition</Identifier>
+		<DisplayName>Out Of Bound Target Plate X Position</DisplayName>
+		<Description>out of bound target plate X position.</Description>
+	</DefinedExecutionError>
+	<DefinedExecutionError>
+		<Identifier>OutOfBoundTargetPlateYPosition</Identifier>
+		<DisplayName>Out Of Bound Target Plate Y Position</DisplayName>
+		<Description>out of bound target plate Y position.</Description>
+	</DefinedExecutionError>
 </Feature>

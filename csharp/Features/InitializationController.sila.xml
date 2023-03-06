@@ -8,11 +8,11 @@
 
 	<Identifier>InitializationController</Identifier>
 	<DisplayName>Initialization Controller</DisplayName>
-	<Description>Controller to reset and initialize the I.DOT. For the first time, the I.DOT needs to be reset and then initialized. The client is recommended to do the same process when an error happens during another execution.</Description>
+	<Description>Controller to reset and initialize the I.DOT. Upon startup of the device, the I.DOT needs to be reset and then initialized. This procedure can also be used to recover from an error state that is not solvable otherwise.</Description>
 	<Command>
 		<Identifier>Reset</Identifier>
 		<DisplayName>Reset</DisplayName>
-		<Description>Reset the I.DOT.</Description>
+		<Description>Reset the I.DOT. Sending this command is required right after the connection to the SiLA 2 Server is established. Through the flag SimulationMode the device software can either connect to and control the hardware (SimulationMode=False, called "DeviceMode" in the UI) or simulate the hardware (SimulationMode=True, called "DesktopMode" in the UI). We do not recomment to reset the device durring the execution of another command. </Description>
 		<Observable>Yes</Observable>
 		<Parameter>
 			<Identifier>SimulationMode</Identifier>

@@ -26,7 +26,10 @@
 	<Property>
 		<Identifier>InstrumentStatus</Identifier>
 		<DisplayName>Instrument Status</DisplayName>
-		<Description>I.DOT status will be either not initialized, idle, dispensing, or dispensing pause requested. Please note that after initializing the status will be idle, which means the system is ready for any command.</Description>
+		<Description>The status of the I.DOT device can be "NotInitialized", "Standby", "InError", "Idle", "Dispensing", or "DispensingPauseRequested" requested. Please note that after initializing the status will be idle, which means the system is ready for any command. 
+			The device state is "Standby" between Reset and Initialize. 
+			If there is an error while processing a command, the device state will be "InError". And at the Log panel, handling error details will be shown to users.
+		</Description>
 		<Observable>No</Observable>
 		<DataType>
 			<Basic>String</Basic>
