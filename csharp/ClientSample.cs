@@ -11,7 +11,6 @@ using Instrumentstatusprovider = Sila2.Dx.Idot.Sila.Dispensing.Instrumentstatusp
 using PlateLoadingController = Sila2.Dx.Idot.Sila.Dispensing.Platetraycontroller.V1;
 using ShutdownController = Sila2.Dx.Idot.Sila.Dispensing.Shutdowncontroller.V1;
 using SiLAService = Sila2.Org.Silastandard.Core.Silaservice.V1;
-
 using Boolean = Sila2.Org.Silastandard.Boolean;
 using Microsoft.Extensions.DependencyInjection;
 using Sila2.Org.Silastandard.Core.Errorrecoveryservice.V1;
@@ -21,10 +20,18 @@ public class ClientSample
 {
     // Definition of all ávailable IDOT API client service
     private readonly DispensingService.DispensingService.DispensingServiceClient _dispensingServiceClient;
-    private readonly InitializationController.InitializationController.InitializationControllerClient _initializationControllerClient;
-    private readonly Abortprocesscontroller.AbortProcessController.AbortProcessControllerClient _abortProcessControllerClient;
+
+    private readonly InitializationController.InitializationController.InitializationControllerClient
+        _initializationControllerClient;
+
+    private readonly Abortprocesscontroller.AbortProcessController.AbortProcessControllerClient
+        _abortProcessControllerClient;
+
     private readonly Barcodereaderservice.BarcodeReaderService.BarcodeReaderServiceClient _barcodeReaderServiceClient;
-    private readonly Instrumentstatusprovider.InstrumentStatusProvider.InstrumentStatusProviderClient _instrumentStatusProviderClient;
+
+    private readonly Instrumentstatusprovider.InstrumentStatusProvider.InstrumentStatusProviderClient
+        _instrumentStatusProviderClient;
+
     private readonly PlateLoadingController.PlateTrayController.PlateTrayControllerClient _plateTrayControllerClient;
     private readonly ShutdownController.ShutdownController.ShutdownControllerClient _shutdownControllerClient;
     private readonly ErrorRecoveryService.ErrorRecoveryServiceClient _errorRecoveryClient;
@@ -39,12 +46,17 @@ public class ClientSample
         GrpcChannel serverChannel = FindServerChannel().Result;
 
         // Initialize client services
-        _initializationControllerClient = new InitializationController.InitializationController.InitializationControllerClient(serverChannel);
+        _initializationControllerClient =
+            new InitializationController.InitializationController.InitializationControllerClient(serverChannel);
         _dispensingServiceClient = new DispensingService.DispensingService.DispensingServiceClient(serverChannel);
-        _abortProcessControllerClient = new Abortprocesscontroller.AbortProcessController.AbortProcessControllerClient(serverChannel);
-        _barcodeReaderServiceClient = new Barcodereaderservice.BarcodeReaderService.BarcodeReaderServiceClient(serverChannel);
-        _instrumentStatusProviderClient = new Instrumentstatusprovider.InstrumentStatusProvider.InstrumentStatusProviderClient(serverChannel);
-        _plateTrayControllerClient = new PlateLoadingController.PlateTrayController.PlateTrayControllerClient(serverChannel);
+        _abortProcessControllerClient =
+            new Abortprocesscontroller.AbortProcessController.AbortProcessControllerClient(serverChannel);
+        _barcodeReaderServiceClient =
+            new Barcodereaderservice.BarcodeReaderService.BarcodeReaderServiceClient(serverChannel);
+        _instrumentStatusProviderClient =
+            new Instrumentstatusprovider.InstrumentStatusProvider.InstrumentStatusProviderClient(serverChannel);
+        _plateTrayControllerClient =
+            new PlateLoadingController.PlateTrayController.PlateTrayControllerClient(serverChannel);
         _shutdownControllerClient = new ShutdownController.ShutdownController.ShutdownControllerClient(serverChannel);
         _errorRecoveryClient = new ErrorRecoveryService.ErrorRecoveryServiceClient(serverChannel);
 
@@ -67,13 +79,13 @@ public class ClientSample
         GrpcChannel serverChannel;
 
         IConfigurationBuilder? configBuilder = new ConfigurationBuilder()
-                                               .SetBasePath(Directory.GetCurrentDirectory())
-                                               .AddJsonFile("appsettings.json", true, true);
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", true, true);
         _configuration = configBuilder.Build();
         string? fqhn = _configuration["Connection:FQHN"];
         int port = int.Parse(_configuration["Connection:Port"]);
 
-        var clientSetup = new SiLA2.Client.Configurator(_configuration, new string[] {});
+        var clientSetup = new SiLA2.Client.Configurator(_configuration, new string[] { });
         Console.WriteLine("Starting Server Discovery...");
 
         var serverMap = await clientSetup.SearchForServers();
@@ -87,8 +99,10 @@ public class ClientSample
         }
         else
         {
-            Console.WriteLine($"No connection automatically discovered. Using Server-URI '{fqhn}:{port}' from appSettings.config");
-            serverChannel = await clientSetup.ServiceProvider.GetService<IGrpcChannelProvider>()?.GetChannel(fqhn, port, true)!;
+            Console.WriteLine(
+                $"No connection automatically discovered. Using Server-URI '{fqhn}:{port}' from appSettings.config");
+            serverChannel = await clientSetup.ServiceProvider.GetService<IGrpcChannelProvider>()
+                ?.GetChannel(fqhn, port, true)!;
         }
 
         return serverChannel;
@@ -122,16 +136,20 @@ public class ClientSample
         try
         {
             CommandConfirmation? commandReset =
-                _initializationControllerClient.Reset(new InitializationController.Reset_Parameters { SimulationMode = new Boolean { Value = simulationMod } });
+                _initializationControllerClient.Reset(new InitializationController.Reset_Parameters
+                    {SimulationMode = new Boolean {Value = simulationMod}});
 
-            using (AsyncServerStreamingCall<ExecutionInfo>? call = _initializationControllerClient.Reset_Info(commandReset.CommandExecutionUUID))
+            using (AsyncServerStreamingCall<ExecutionInfo>? call =
+                   _initializationControllerClient.Reset_Info(commandReset.CommandExecutionUUID))
             {
                 await WaitForExecutionCommend(call);
                 _initializationControllerClient.Reset_Result(commandReset.CommandExecutionUUID);
             }
 
-            CommandConfirmation? commandInitialize = _initializationControllerClient.Initialize(new InitializationController.Initialize_Parameters());
-            using (AsyncServerStreamingCall<ExecutionInfo>? call = _initializationControllerClient.Initialize_Info(commandInitialize.CommandExecutionUUID))
+            CommandConfirmation? commandInitialize =
+                _initializationControllerClient.Initialize(new InitializationController.Initialize_Parameters());
+            using (AsyncServerStreamingCall<ExecutionInfo>? call =
+                   _initializationControllerClient.Initialize_Info(commandInitialize.CommandExecutionUUID))
             {
                 await WaitForExecutionCommend(call);
                 _initializationControllerClient.Initialize_Result(commandInitialize.CommandExecutionUUID);
@@ -156,7 +174,8 @@ public class ClientSample
         try
         {
             var instrumentStatusInitial =
-                _instrumentStatusProviderClient.Get_InstrumentStatus(new Instrumentstatusprovider.Get_InstrumentStatus_Parameters());
+                _instrumentStatusProviderClient.Get_InstrumentStatus(
+                    new Instrumentstatusprovider.Get_InstrumentStatus_Parameters());
             if (instrumentStatusInitial.InstrumentStatus.Value != "Idle")
             {
                 Console.WriteLine("I.DOT to execute a protocol  should be in the Idle state.");
@@ -164,12 +183,12 @@ public class ClientSample
             }
 
             //This command runs asynchronously. To query the result or get the execution status you can use the return Command Execution UUID
-            CommandExecutionUUID? DispenseCommandID = _dispensingServiceClient
-                                              .DispenseProtocol(new DispensingService.DispenseProtocol_Parameters()
-                                              {
-                                                  FileNamePath = new Sila2.Org.Silastandard.String() { Value = filePath }
-                                              })
-                                              .CommandExecutionUUID;
+            CommandExecutionUUID? firstDispenseCommandID = _dispensingServiceClient
+                .DispenseProtocol(new DispensingService.DispenseProtocol_Parameters()
+                {
+                    FileNamePath = new Sila2.Org.Silastandard.String() {Value = filePath}
+                })
+                .CommandExecutionUUID;
             Console.WriteLine("Sent DispenseProtocol Command.");
 
             ////This command runs asynchronously. To query the result or get the execution status you can use the return Command Execution UUID
@@ -212,7 +231,7 @@ public class ClientSample
                 _instrumentStatusProviderClient.Get_InstrumentStatus(
                     new Instrumentstatusprovider.Get_InstrumentStatus_Parameters());
 
-            Console.WriteLine("The device status is " + instrumentStatusDuringDispense.ToString());
+            Console.WriteLine("The device status is " + instrumentStatusDuringDispense.InstrumentStatus.Value);
 
             //if (instrumentStatusDuringDispense.InstrumentStatus.Value != "Idle")
             //{
@@ -227,19 +246,22 @@ public class ClientSample
             //    Console.WriteLine("The new device status after abort is: " + instrumentStatusAfterAbort.InstrumentStatus.Value.ToString());
             //}
 
-            
-            // Wait for command execution to finish
-            using (AsyncServerStreamingCall<ExecutionInfo>? call = _dispensingServiceClient.DispenseProtocol_Info(DispenseCommandID))
+
+            // Check dispense status
+            using (AsyncServerStreamingCall<ExecutionInfo>? call =
+                   _dispensingServiceClient.DispenseProtocol_Info(firstDispenseCommandID))
             {
                 IAsyncStreamReader<ExecutionInfo>? responseStream = call.ResponseStream;
                 var cancellationToken = new CancellationTokenSource();
 
-                while (await responseStream.MoveNext(cancellationToken.Token))
+                for (int i = 0; i < 3; i++)
                 {
+                    await responseStream.MoveNext(cancellationToken.Token);
+
                     // Query the dispense progress status and display it in the console
                     ExecutionInfo? currentExecutionInfo = responseStream.Current;
                     string? message =
-                        $"--> Command DispenseProtocol    -status: {currentExecutionInfo.CommandStatus}   -remaining time: {currentExecutionInfo.EstimatedRemainingTime?.Seconds,3:###}s    -progress: {currentExecutionInfo.ProgressInfo.Value}";
+                        $"--> First Command DispenseProtocol    -status: {currentExecutionInfo.CommandStatus}   -remaining time: {currentExecutionInfo.EstimatedRemainingTime?.Seconds,3:###}s    -progress: {currentExecutionInfo.ProgressInfo.Value}";
                     Console.WriteLine(message);
 
                     //var instrumentStatusDuringDispense2 =
@@ -253,13 +275,161 @@ public class ClientSample
                     {
                         break;
                     }
-
                 }
             }
 
-            var result = _dispensingServiceClient.DispenseProtocol_Result(DispenseCommandID);
+            Console.WriteLine("Sending second dispense command even though the server is still busy. This should fail.");
 
-            Console.WriteLine("DispenseProtocol result:" + result.ToString());
+            //This command runs asynchronously. To query the result or get the execution status you can use the return Command Execution UUID
+            CommandExecutionUUID? secondDispenseCommandID = _dispensingServiceClient
+                .DispenseProtocol(new DispensingService.DispenseProtocol_Parameters()
+                {
+                    FileNamePath = new Sila2.Org.Silastandard.String() {Value = filePath}
+                })
+                .CommandExecutionUUID;
+
+            // Wait for command execution to finish
+            using (AsyncServerStreamingCall<ExecutionInfo>? call =
+                   _dispensingServiceClient.DispenseProtocol_Info(secondDispenseCommandID))
+            {
+                IAsyncStreamReader<ExecutionInfo>? responseStream = call.ResponseStream;
+                var cancellationToken = new CancellationTokenSource();
+
+                int streamItemCounter = 0;
+                while (await responseStream.MoveNext(cancellationToken.Token))
+                {
+                    ExecutionInfo? currentExecutionInfo = responseStream.Current;
+
+                    // only print every 100th status
+                    if (streamItemCounter % 100 == 0)
+                    {
+                        // Query the dispense progress status and display it in the console
+                        string? message =
+                            $"--> Second Command DispenseProtocol    -status: {currentExecutionInfo.CommandStatus}   -remaining time: {currentExecutionInfo.EstimatedRemainingTime?.Seconds,3:###}s    -progress: {currentExecutionInfo.ProgressInfo.Value}";
+                        Console.WriteLine(message);
+
+                        //var instrumentStatusDuringDispense2 =
+                        //    _instrumentStatusProviderClient.Get_InstrumentStatus(
+                        //        new Instrumentstatusprovider.Get_InstrumentStatus_Parameters());
+
+                        //Console.WriteLine("The device status is " + instrumentStatusDuringDispense2.InstrumentStatus.Value);
+                    }
+
+                    if (currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedSuccessfully ||
+                        currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedWithError)
+                    {
+                        string? message =
+                            $"--> Second Command DispenseProtocol    -status: {currentExecutionInfo.CommandStatus}   -remaining time: {currentExecutionInfo.EstimatedRemainingTime?.Seconds,3:###}s    -progress: {currentExecutionInfo.ProgressInfo.Value}";
+                        Console.WriteLine(message);
+                        break;
+                    }
+
+                    streamItemCounter++;
+                }
+            }
+
+            // Wait for command execution to finish
+            using (AsyncServerStreamingCall<ExecutionInfo>? call =
+                   _dispensingServiceClient.DispenseProtocol_Info(firstDispenseCommandID))
+            {
+                IAsyncStreamReader<ExecutionInfo>? responseStream = call.ResponseStream;
+                var cancellationToken = new CancellationTokenSource();
+
+                int streamItemCounter = 0;
+                while (await responseStream.MoveNext(cancellationToken.Token))
+                {
+                    ExecutionInfo? currentExecutionInfo = responseStream.Current;
+
+                    // only print every 100th status
+                    if (streamItemCounter % 100 == 0)
+                    {
+                        // Query the dispense progress status and display it in the console
+                        string? message =
+                            $"--> First Command DispenseProtocol    -status: {currentExecutionInfo.CommandStatus}   -remaining time: {currentExecutionInfo.EstimatedRemainingTime?.Seconds,3:###}s    -progress: {currentExecutionInfo.ProgressInfo.Value}";
+                        Console.WriteLine(message);
+
+                        //var instrumentStatusDuringDispense2 =
+                        //    _instrumentStatusProviderClient.Get_InstrumentStatus(
+                        //        new Instrumentstatusprovider.Get_InstrumentStatus_Parameters());
+
+                        //Console.WriteLine("The device status is " + instrumentStatusDuringDispense2.InstrumentStatus.Value);
+                    }
+
+                    if (currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedSuccessfully ||
+                        currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedWithError)
+                    {
+                        string? message =
+                            $"--> First Command DispenseProtocol    -status: {currentExecutionInfo.CommandStatus}   -remaining time: {currentExecutionInfo.EstimatedRemainingTime?.Seconds,3:###}s    -progress: {currentExecutionInfo.ProgressInfo.Value}";
+                        Console.WriteLine(message);
+                        break;
+                    }
+
+                    streamItemCounter++;
+                }
+            }
+
+            var firstDispenseResult = _dispensingServiceClient.DispenseProtocol_Result(firstDispenseCommandID);
+            Console.WriteLine("First DispenseProtocol result: " + firstDispenseResult.ToString());
+
+            Thread.Sleep(1000);
+
+            var instrumentStatusAfterDispense =
+                _instrumentStatusProviderClient.Get_InstrumentStatus(
+                    new Instrumentstatusprovider.Get_InstrumentStatus_Parameters());
+
+            Console.WriteLine("The device status is " + instrumentStatusAfterDispense.InstrumentStatus.Value);
+
+
+            Console.WriteLine("Sending third dispense command.");
+
+            CommandExecutionUUID? thirdDispenseCommandID = _dispensingServiceClient
+                .DispenseProtocol(new DispensingService.DispenseProtocol_Parameters()
+                {
+                    FileNamePath = new Sila2.Org.Silastandard.String() {Value = filePath}
+                })
+                .CommandExecutionUUID;
+
+            using (AsyncServerStreamingCall<ExecutionInfo>? call =
+                   _dispensingServiceClient.DispenseProtocol_Info(thirdDispenseCommandID))
+            {
+                IAsyncStreamReader<ExecutionInfo>? responseStream = call.ResponseStream;
+                var cancellationToken = new CancellationTokenSource();
+
+                int streamItemCounter = 1;
+                while (await responseStream.MoveNext(cancellationToken.Token))
+                {
+                    ExecutionInfo? currentExecutionInfo = responseStream.Current;
+
+                    // only print every 100th status
+                    if (streamItemCounter % 100 == 0)
+                    {
+                        // Query the dispense progress status and display it in the console
+                        string? message =
+                            $"--> Third Command DispenseProtocol    -status: {currentExecutionInfo.CommandStatus}   -remaining time: {currentExecutionInfo.EstimatedRemainingTime?.Seconds,3:###}s    -progress: {currentExecutionInfo.ProgressInfo.Value}";
+                        Console.WriteLine(message);
+
+                        //var instrumentStatusDuringDispense2 =
+                        //    _instrumentStatusProviderClient.Get_InstrumentStatus(
+                        //        new Instrumentstatusprovider.Get_InstrumentStatus_Parameters());
+
+                        //Console.WriteLine("The device status is " + instrumentStatusDuringDispense2.ToString());
+                    }
+
+                    if (currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedSuccessfully ||
+                        currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedWithError)
+                    {
+                        string? message =
+                            $"--> Third Command DispenseProtocol    -status: {currentExecutionInfo.CommandStatus}   -remaining time: {currentExecutionInfo.EstimatedRemainingTime?.Seconds,3:###}s    -progress: {currentExecutionInfo.ProgressInfo.Value}";
+                        Console.WriteLine(message);
+                        break;
+                    }
+
+                    streamItemCounter++;
+                }
+
+                var thirdDispenseResult = _dispensingServiceClient.DispenseProtocol_Result(thirdDispenseCommandID);
+                Console.WriteLine("Third DispenseProtocol result: " + thirdDispenseResult.ToString());
+            }
         }
         catch (Exception e)
         {
@@ -268,5 +438,4 @@ public class ClientSample
             Console.WriteLine(error);
         }
     }
-
 }
