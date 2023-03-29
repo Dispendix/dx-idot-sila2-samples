@@ -34,8 +34,8 @@ public class ClientSample
     public ClientSample()
     {
         // Sample csv protocol
-        // string filePath = $"{AppDomain.CurrentDomain.BaseDirectory}Resources{Path.DirectorySeparatorChar}TestSila.csv";
-        string filePath = "C:\\Users\\ValentinBusch\\I-DOT Assay Studio\\Protocols\\Test CSV Normal.csv";
+        string filePath = $"{AppDomain.CurrentDomain.BaseDirectory}Resources{Path.DirectorySeparatorChar}TestSila.csv";
+        // string filePath = "C:\\Users\\ValentinBusch\\I-DOT Assay Studio\\Protocols\\Test CSV Normal.csv";
         GrpcChannel serverChannel = FindServerChannel().Result;
 
         // Initialize client services
@@ -212,20 +212,22 @@ public class ClientSample
                 _instrumentStatusProviderClient.Get_InstrumentStatus(
                     new Instrumentstatusprovider.Get_InstrumentStatus_Parameters());
 
-            if (instrumentStatusDuringDispense.InstrumentStatus.Value != "Idle")
-            {
-                Console.WriteLine("The I.DOT is still busy dispensing the protocol. Aborting dispensing...");
-                _abortProcessControllerClient.AbortProcess(new Abortprocesscontroller.AbortProcess_Parameters());
-            }
+            Console.WriteLine("The device status is " + instrumentStatusDuringDispense.ToString());
 
-            Thread.Sleep(1000);
+            //if (instrumentStatusDuringDispense.InstrumentStatus.Value != "Idle")
+            //{
+            //    Console.WriteLine("The I.DOT is still busy dispensing the protocol. Aborting dispensing...");
+            //    _abortProcessControllerClient.AbortProcess(new Abortprocesscontroller.AbortProcess_Parameters());
 
-            var instrumentStatusAfterAbort =
-                _instrumentStatusProviderClient.Get_InstrumentStatus(
-                    new Instrumentstatusprovider.Get_InstrumentStatus_Parameters());
-            Console.WriteLine("The new device status after abort is: " + instrumentStatusAfterAbort.InstrumentStatus.Value.ToString());
+            //    Thread.Sleep(1000);
 
+            //    var instrumentStatusAfterAbort =
+            //        _instrumentStatusProviderClient.Get_InstrumentStatus(
+            //            new Instrumentstatusprovider.Get_InstrumentStatus_Parameters());
+            //    Console.WriteLine("The new device status after abort is: " + instrumentStatusAfterAbort.InstrumentStatus.Value.ToString());
+            //}
 
+            
             // Wait for command execution to finish
             using (AsyncServerStreamingCall<ExecutionInfo>? call = _dispensingServiceClient.DispenseProtocol_Info(DispenseCommandID))
             {
@@ -240,16 +242,24 @@ public class ClientSample
                         $"--> Command DispenseProtocol    -status: {currentExecutionInfo.CommandStatus}   -remaining time: {currentExecutionInfo.EstimatedRemainingTime?.Seconds,3:###}s    -progress: {currentExecutionInfo.ProgressInfo.Value}";
                     Console.WriteLine(message);
 
+                    //var instrumentStatusDuringDispense2 =
+                    //    _instrumentStatusProviderClient.Get_InstrumentStatus(
+                    //        new Instrumentstatusprovider.Get_InstrumentStatus_Parameters());
+
+                    //Console.WriteLine("The device status is " + instrumentStatusDuringDispense2.ToString());
+
                     if (currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedSuccessfully ||
                         currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedWithError)
                     {
                         break;
                     }
+
                 }
             }
 
+            var result = _dispensingServiceClient.DispenseProtocol_Result(DispenseCommandID);
 
-            _dispensingServiceClient.DispenseProtocol_Result(DispenseCommandID);
+            Console.WriteLine("DispenseProtocol result:" + result.ToString());
         }
         catch (Exception e)
         {
