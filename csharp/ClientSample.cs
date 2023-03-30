@@ -62,10 +62,7 @@ public class ClientSample
 
         // Initialize device and execute sample protocol
         InitIDotDevice(true).Wait();
-        DispenseProtocol(filePath, 0).Wait();
-        DispenseProtocol(filePath, 1000).Wait();
-        DispenseProtocol(filePath, 0).Wait();
-        DispenseProtocol(filePath, 1200).Wait();
+        DispenseProtocol(filePath).Wait();
     }
 
     /// <summary>
@@ -161,8 +158,7 @@ public class ClientSample
     /// Dispense a CSV protcol
     /// </summary>
     /// <param name="filePath">CSV protocol file path. This file should exist on the server side</param>
-    /// <param name="callAbortTimeoutMiliseconds">Suspend the current dispensing command for the specified number of milliseconds. To dispense without abort set zero.</param>
-    public async Task DispenseProtocol(string filePath, int callAbortTimeoutMiliseconds)
+    public async Task DispenseProtocol(string filePath)
     {
         try
         {
@@ -173,20 +169,6 @@ public class ClientSample
                 Console.ForegroundColor = ConsoleColor.DarkMagenta;
                 Console.WriteLine("I.DOT to execute a protocol  should be in the Idle state.");
                 return;
-            }
-
-            if (callAbortTimeoutMiliseconds > 0)
-            {
-                await Task.Run(() =>
-                {
-                    instrumentStatus =
-                        _instrumentStatusProviderClient.Get_InstrumentStatus(new Instrumentstatusprovider.Get_InstrumentStatus_Parameters());
-                    Console.WriteLine(@$"----> I.DOT state before executing AbortProcess command is {instrumentStatus.InstrumentStatus.Value}.");
-
-                    Thread.Sleep(callAbortTimeoutMiliseconds);
-                    _abortProcessControllerClient.AbortProcess(new Abortprocesscontroller.AbortProcess_Parameters());
-                    Console.WriteLine("----> Command AbortProcess has been called.");
-                });
             }
 
             //This command runs asynchronously. To query the result or get the execution status you can use the return Command Execution UUID
