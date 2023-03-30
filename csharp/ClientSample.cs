@@ -48,11 +48,20 @@ public class ClientSample
         _errorRecoveryClient = new ErrorRecoveryService.ErrorRecoveryServiceClient(serverChannel);
 
         _siLAServiceClient = new SiLAService.SiLAService.SiLAServiceClient(serverChannel);
-        var serverVersion = _siLAServiceClient.Get_ServerVersion(new SiLAService.Get_ServerVersion_Parameters());
-        Console.WriteLine($"Server Service Version: {serverVersion}");
+
+        try
+        {
+            var serverVersion = _siLAServiceClient.Get_ServerVersion(new SiLAService.Get_ServerVersion_Parameters());
+            Console.WriteLine($"Server Service Version: {serverVersion}");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("I.DOT SiLA2 client sample can not connect to the I.DOT SiLA2 server.");
+            return;
+        }
 
         // Initialize device and execute sample protocol
-        InitIDotDevice().Wait();
+        InitIDotDevice(true).Wait();
         DispenseProtocol(filePath).Wait();
     }
 
