@@ -10,9 +10,21 @@
 	<DisplayName>Shutdown Controller</DisplayName>
 	<Description>Controller to shutdown the I.DOT.</Description>
 	<Command>
-		<Identifier>Shutdown</Identifier>
-		<DisplayName>Shut down</DisplayName>
-		<Description>Shutdown I.DOT.</Description>
+		<Identifier>ShutDownSiLA2Server</Identifier>
+		<DisplayName>Shut Down SiLA2 Server</DisplayName>
+		<Description>Shuts down the SiLA 2 server application Dx.IDot.SiLA2.Service.exe.</Description>
+		<Observable>No</Observable>
+	</Command>
+	<Command>
+		<Identifier>ShutDownDevice</Identifier>
+		<DisplayName>Shut Down Device</DisplayName>
+		<Description>
+			This command requires DistributionBoard v1.1.1.0 or higher.
+
+			Shuts down the I.DOT device including the tablet.
+			By shutting down the I.DOT device, the power supply of the MS Surface Tablet on the device is stopped.
+			To avoid that the tablet switches to battery mode, this command will invoke a timed shutdown after 30s and 60s respectively in the tablet Windows OS and the I.DOT firmware.
+		</Description>
 		<Observable>No</Observable>
 	</Command>
 </Feature>

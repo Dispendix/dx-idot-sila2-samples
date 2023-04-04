@@ -8,16 +8,28 @@
 
 	<Identifier>InitializationController</Identifier>
 	<DisplayName>Initialization Controller</DisplayName>
-	<Description>Controller to reset and initialize the I.DOT. Upon startup of the device, the I.DOT needs to be reset and then initialized. This procedure can also be used to recover from an error state that is not solvable otherwise.</Description>
+	<Description>
+		Controller to reset and initialize the I.DOT. Upon startup of the device, the I.DOT needs to be reset and then initialized.
+		This procedure can also be used to recover from an error state that is not solvable otherwise.
+	</Description>
 	<Command>
 		<Identifier>Reset</Identifier>
 		<DisplayName>Reset</DisplayName>
-		<Description>Reset the I.DOT. Sending this command is required right after the connection to the SiLA 2 Server is established. Through the flag SimulationMode the device software can either connect to and control the hardware (SimulationMode=False, called "DeviceMode" in the UI) or simulate the hardware (SimulationMode=True, called "DesktopMode" in the UI). We do not recomment to reset the device durring the execution of another command. </Description>
+		<Description>
+			Reset the I.DOT. Sending this command is required right after the connection to the SiLA 2 Server is established.
+			Through the flag SimulationMode the device software can either connect to and control the hardware, or run in simulation.
+
+			We do not recommend to reset the device during the execution of another command.
+		</Description>
 		<Observable>Yes</Observable>
 		<Parameter>
 			<Identifier>SimulationMode</Identifier>
-			<DisplayName>simulation Mode</DisplayName>
-			<Description>State of the I.DOT. True means running I.DOT in simulation mode and false means running the I.DOT with hardware connectivity</Description>
+			<DisplayName>Simulation Mode</DisplayName>
+			<Description>
+				Connection mode of the I.DOT. 
+				SimulationMode=False (called "DeviceMode" in the UI) means running the I.DOT with hardware connectivity; 
+				SimulationMode=True (called "DesktopMode" in the UI) means running I.DOT in simulation mode.
+			</Description>
 			<DataType>
 				<Basic>Boolean</Basic>
 			</DataType>
@@ -26,7 +38,7 @@
 	<Command>
 		<Identifier>Initialize</Identifier>
 		<DisplayName>Initialize</DisplayName>
-		<Description>initialize I.DOT instrument.</Description>
+		<Description>Initialize I.DOT instrument.</Description>
 		<Observable>Yes</Observable>
 	</Command>
 </Feature>

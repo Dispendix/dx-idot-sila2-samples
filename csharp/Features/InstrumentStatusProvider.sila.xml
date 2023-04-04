@@ -8,7 +8,12 @@
 
 	<Identifier>InstrumentStatusProvider</Identifier>
 	<DisplayName>Instrument Status Provider</DisplayName>
-	<Description>Provider to access properties related to the I.DOT status. This provider can  be used to check the state of the device before executing another command in order ensure proper functioning. It can also be used for maintenance and troubleshooting processes.</Description>
+	<Description>
+		Provider to access properties related to the I.DOT status. This provider can  be used to check the state of the device before executing another 
+		command in order ensure proper functioning.
+
+		It can also be used for maintenance and troubleshooting processes.
+	</Description>
 	<Property>
 		<Identifier>DeviceInputPressure</Identifier>
 		<DisplayName>Device Input Pressure</DisplayName>
@@ -26,9 +31,11 @@
 	<Property>
 		<Identifier>InstrumentStatus</Identifier>
 		<DisplayName>Instrument Status</DisplayName>
-		<Description>The status of the I.DOT device can be "NotInitialized", "Standby", "InError", "Idle", "Dispensing", or "DispensingPauseRequested" requested. Please note that after initializing the status will be idle, which means the system is ready for any command. 
-			The device state is "Standby" between Reset and Initialize. 
-			If there is an error while processing a command, the device state will be "InError". And at the Log panel, handling error details will be shown to users.
+		<Description>
+			The status of the I.DOT device can be "NotInitialized", "Standby", "InError", "Idle", "Dispensing", or "DispensingPauseRequested" requested. 
+			Please note that after initializing the status will be idle, which means the system is ready for any command.
+			The device state is "Standby" between Reset and Initialize.
+			If there is an error while processing a command, the device state will be "InError".
 		</Description>
 		<Observable>No</Observable>
 		<DataType>

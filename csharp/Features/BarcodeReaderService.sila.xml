@@ -8,15 +8,19 @@
 
 	<Identifier>BarcodeReaderService</Identifier>
 	<DisplayName>Barcode Reader Service</DisplayName>
-	<Description>Service to read a barcode from a SBS format plate that has been placed in either the source tray or the target tray.
+	<Description>
+		Service to read a barcode from a SBS format plate that has been placed in either the source tray or the target tray.
 
 		Reading barcodes with this feature is possible only if the I.DOT is equipped with a barcode reader. This can be checked via the property Barcode Reader Availability.
-		To sucessfully read a barcode, it must be positioned correctly on the plate, and the plate must be oriented in the tray so that the barcode is facing the barcode reader.
+		To successfully read a barcode, it must be positioned correctly on the plate, and the plate must be oriented in the tray so that the barcode is facing the barcode reader.
 	</Description>
 	<Command>
 		<Identifier>ReadBarcodeOnPlate</Identifier>
 		<DisplayName>Read Barcode On Plate</DisplayName>
-		<Description>Read the source or target plate barcode. To use this feature, make sure the I.DOT instrument has the barcode reader component installed.</Description>
+		<Description>
+			Read a barcode on either a source or target plate that is currently inside of the device.
+			To use this feature, make sure the I.DOT instrument has the barcode reader component installed and the barcode is positioned correctly on the plate.
+		</Description>
 		<Observable>Yes</Observable>
 		<Parameter>
 			<Identifier>PlateTray</Identifier>
@@ -29,8 +33,8 @@
 					</DataType>
 					<Constraints>
 						<Set>
-							<Value>BarcodeTarget</Value>
-							<Value>BarcodeSource</Value>
+							<Value>Target</Value>
+							<Value>Source</Value>
 						</Set>
 					</Constraints>
 				</Constrained>
@@ -44,15 +48,32 @@
 				<Basic>String</Basic>
 			</DataType>
 		</Response>
+		<DefinedExecutionErrors>
+			<Identifier>BarcodeReaderNotAvailable</Identifier>
+			<Identifier>UnknownTrayType</Identifier>
+		</DefinedExecutionErrors>
 	</Command>
 	<Property>
 		<Identifier>BarcodeReaderAvailability</Identifier>
 		<DisplayName>Barcode Reader Availability</DisplayName>
-		<Description>Query whether the barcode reader is available or not. This property reflects the state of the "UseBarcodeReader" property in the I.DOT Assay Studio configuration file. This property can be changed in the general settings of I.DOT Assay Studio and requires the barcode reader component to be installed in the device to be set to TRUE.</Description>
+		<Description>
+			Query whether the barcode reader is available or not. This property reflects the state of the "UseBarcodeReader" property in the
+			I.DOT Assay Studio configuration file. This property can be changed in the general settings of I.DOT Assay Studio and requires the 
+			barcode reader component to be installed in the device to be set to TRUE.
+		</Description>
 		<Observable>No</Observable>
 		<DataType>
 			<Basic>Boolean</Basic>
 		</DataType>
 	</Property>
-
+	<DefinedExecutionError>
+		<Identifier>BarcodeReaderNotAvailable</Identifier>
+		<DisplayName>Barcode Reader Not Available</DisplayName>
+		<Description>The barcode reader is currently not available.</Description>
+	</DefinedExecutionError>
+	<DefinedExecutionError>
+		<Identifier>UnknownTrayType</Identifier>
+		<DisplayName>Unknown Tray Type</DisplayName>
+		<Description>Unknown tray type value. Only 'Target' and 'Source' are valid.</Description>
+	</DefinedExecutionError>
 </Feature>

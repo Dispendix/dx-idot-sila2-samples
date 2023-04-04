@@ -8,16 +8,27 @@
 
 	<Identifier>DispensingService</Identifier>
 	<DisplayName>Dispensing Service</DisplayName>
-	<Description>Service to access the dispensing commands of the I.DOT. Please note that the client should insert the respective target and source plates using the PlateLoadingService before dispensing.</Description>
+	<Description>
+		Service to access the dispensing commands of the I.DOT. Please note that the client should insert the respective target and source plates
+		using the Plate Tray Controller before dispensing.
+	</Description>
 	<Command>
 		<Identifier>DispenseProtocol</Identifier>
 		<DisplayName>Dispense Protocol</DisplayName>
-		<Description>Dispenses a CSV protocol located on the I.DOT's hard drive or is accessible by the I.DOT software through a connected network drive.</Description>
+		<Description>
+			Dispenses a CSV protocol located on the I.DOT's hard drive or is accessible by the I.DOT software through a connected network drive.
+			This command will only accept CSV protocols with one source and one target plate. More complex dispense runs that utilize additional
+			source and/or target plates can be achieved through chaining several such single-plate CSV protocols which are orchestrated by using
+			the Plate Tray Controller to load plates in-between. Multi-plate CSV protocols are not supported via this API.
+		</Description>
 		<Observable>Yes</Observable>
 		<Parameter>
 			<Identifier>FileNamePath</Identifier>
 			<DisplayName>File Name Path</DisplayName>
-			<Description>Full local path to a CSV protocol. The *.csv file must adhere to the I.DOT CSV format. All used liquids, liquid classes, and plate formats must be present on the I.DOT.</Description>
+			<Description>
+				Full local path to a CSV protocol. The *.csv file must adhere to the I.DOT CSV format. All used liquids, liquid classes,
+				and labware formats must be present on the I.DOT.
+			</Description>
 			<DataType>
 				<Basic>String</Basic>
 			</DataType>
@@ -30,16 +41,15 @@
 			<Identifier>MoreThanOneTargetPlateDetected</Identifier>
 			<Identifier>NoSourcePlateDetected</Identifier>
 			<Identifier>NoTargetPlateDetected</Identifier>
-			<Identifier>UnsupportedSourcePlate</Identifier>
-			<Identifier>UnsupportedTargetPlate</Identifier>
-			<Identifier>NoSourcePlateInPlateFormatLibrary</Identifier>
-			<Identifier>NoTargetPlateInPlateFormatLibrary</Identifier>
-			<Identifier>NoLiquidClassInLiquidClassLibrary</Identifier>
-			<Identifier>OutOfBoundSourcePlateRow</Identifier>
-			<Identifier>OutOfBoundTargetPlateRow</Identifier>
-			<Identifier>OutOfBoundSourcePlateColumn</Identifier>
-			<Identifier>OutOfBoundTargetPlateColumn</Identifier>
-			<Identifier>OutOfBoundDispenseVolume</Identifier>
+			<Identifier>UnknownSourcePlate</Identifier>
+			<Identifier>UnknownTargetPlate</Identifier>
+			<Identifier>UnknownLiquidClass</Identifier>
+			<Identifier>OutOfBoundsSourcePlateRow</Identifier>
+			<Identifier>OutOfBoundsTargetPlateRow</Identifier>
+			<Identifier>OutOfBoundsSourcePlateColumn</Identifier>
+			<Identifier>OutOfBoundsTargetPlateColumn</Identifier>
+			<Identifier>OutOfBoundsDispenseVolume</Identifier>
+			<Identifier>OutOfBoundsAdditionalVolume</Identifier>
 			<Identifier>TransferLiquidFailed</Identifier>
 		</DefinedExecutionErrors>
 	</Command>
@@ -47,41 +57,134 @@
 		<Identifier>TransferLiquid</Identifier>
 		<DisplayName>Transfer Liquid</DisplayName>
 		<Description>
-			Dispense a predefined volume from a predefined source to a predefined destination on the target plate in x-y coordinates. This command provides more low-level access to the dispensing capabilities of the device than the Dispense Protocol Command.
-			IMPORTANT! This command enables direct control of the axis movement and can thereby cause damage if used without thorough understanding of the device, and careful testing. We recommend to use DispenseProtocol for most users.
-			Please refer to the SiLA 2 Automation Guide to learn more how to use this command.
+			Dispense a predefined volume from a predefined source to a predefined destination on the target plate in x-y coordinates. This command provides
+			more low-level access to the dispensing capabilities of the device than the Dispense Protocol Command.
+
+			IMPORTANT! This command enables direct control of the axis movement and can thereby cause damage if used without thorough understanding of the device,
+			and careful testing. We recommend to use DispenseProtocol for most users. Please refer to the I.DOT SiLA 2 Automation Guide to learn more how to use this command.
 		</Description>
 		<Observable>Yes</Observable>
 		<Parameter>
-			<Identifier>XmlTransferSchema</Identifier>
-			<DisplayName>Xml Transfer Schema</DisplayName>
-			<Description>Xml formatted array of SiLA parameter set which describes the transfer schema. Please refer to the API Automation document for more information.</Description>
+			<Identifier>DispenseStepXmlSchema</Identifier>
+			<DisplayName>Dispense Step XML Schema</DisplayName>
+			<Description>
+				XML formatted array of SiLA parameter set which describes the Dispense Step XML Schema.
+
+				Below is a valid example of the Dispense Step XML Schema. To use it, remove the comment markup that encloses the example and remove the "/" in the
+				comment markup that's within some of the elements.
+
+				<!--
+				<?xml version="1.0" encoding="utf-8"?>
+				<ArrayOfSiLADispensingStep xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+					<SiLADispensingStep>
+						<Parameter name="SourcePlateType">
+							<String>S.100 Plate</String>
+						</Parameter>
+						<Parameter name="SourceRow">
+							<Int>0</Int>
+						</Parameter>
+						<Parameter name="SourceColumn">
+							<Int>0</Int>
+						</Parameter>
+						<Parameter name="LiquidClassName">
+							<String>H2O</String>
+						</Parameter>
+						<Parameter name="Volume_µL">
+							<Float>0.1</Float>
+						</Parameter>
+						<Parameter name="AdditionalVolume_µL">
+							<Float>0</Float>
+						</Parameter>
+						<Parameter name="TargetX_µm">
+							<!-/- equals column 1 of 96 well plate  -/->
+								<Int>14500</Int>
+						</Parameter>
+						<Parameter name="TargetY_µm">
+							<!-/- equals row A of 96 well plate -/->
+								<Int>11250</Int>
+						</Parameter>
+					</SiLADispensingStep>
+					<SiLADispensingStep>
+						<Parameter name="SourcePlateType">
+							<String>S.100 Plate</String>
+						</Parameter>
+						<Parameter name="SourceRow">
+							<Int>1</Int>
+						</Parameter>
+						<Parameter name="SourceColumn">
+							<Int>2</Int>
+						</Parameter>
+						<Parameter name="LiquidClassName">
+							<String>H2O</String>
+						</Parameter>
+						<Parameter name="Volume_µL">
+							<Float>0.2</Float>
+						</Parameter>
+						<Parameter name="AdditionalVolume_µL">
+							<Float>0</Float>
+						</Parameter>
+						<Parameter name="TargetX_µm">
+							<!-/- equals column 2 of 96 well plate  -/->
+								<Int>29000</Int>
+						</Parameter>
+						<Parameter name="TargetY_µm">
+							<!-/- equals row B of 96 well plate -/->
+								<Int>22500</Int>
+						</Parameter>
+					</SiLADispensingStep>
+				</ArrayOfSiLADispensingStep>
+				-->
+
+				SourcePlateType: Source plate used on the I.DOT. Currently valid values are S_60 (S.60 Plate), S_100 (S.100 Plate), S_200 (S.200 Plate),
+				L_100 (L.100 Plate), HT_60 (HT.60 Plate)
+
+				SourceRow: Positive integer number to specify the source well. 0 equals row A on the source plate.
+
+				SourceColumn: Positive integer number the specify the source well. 0 equals the first column on the source plate.
+
+				LiquidClassName: Name of the liquid class that’s being used for the dispense. These liquid classes are defined in the Liquid Class Library
+				in I.DOT Assay Studio (Menu -> Libraries). It is necessary that the liquid class is located in the Liquid Class Library of the device receiving
+				the command and has an entry for the Source Plate Type specified above in the same DispenseStepXmlSchema.
+
+				Volume_µL: Volume to be dispensed in this step. The acceptable range for the liquid amounts depend on the liquid class being used and the SourcePlateType.
+				As a general guide, we recommend a value above 15nl to ensure highest accuracy and precision. The upper limit of the S.100 plate is 80µl per source well.
+				If lower amounts than 15nl are necessary, please refer to our applications team.
+
+				AdditionalVolume_µL: If the workflow causes the initial fill volume of the source well to be higher than the minimum needed volume (i.e. Volume_µL), this
+				additional volume should be specified here. This parameter is only used for the I.DOT L to mitigate fill volume based effects on accuracy and precision.
+
+				TargetX_µm: The target X position. Specify as horizontal distance from origin (top-left corner of target plate) in µm.
+
+				TargetY_µm: The target Y position. Specify as vertical distance from origin (top-left corner of target plate) in µm.
+
+			</Description>
 			<DataType>
 				<Basic>String</Basic>
 			</DataType>
 		</Parameter>
 		<Parameter>
-			<Identifier>AllowListOrderOptimization</Identifier>
-			<DisplayName>Allow List Order Optimization</DisplayName>
-			<Description>Optimize list order to minimize positioning effort and use parallel dispensing.</Description>
+			<Identifier>OptimizeDispenseStepOrder</Identifier>
+			<DisplayName>Optimize Dispense Step Order</DisplayName>
+			<Description>Optimize dispense step order to decrease dispensing time and use parallel dispensing.</Description>
 			<DataType>
 				<Basic>Boolean</Basic>
 			</DataType>
 		</Parameter>
 		<DefinedExecutionErrors>
 			<Identifier>IncompatibleState</Identifier>
-			<Identifier>InvalidTrasnferXMLSchema</Identifier>
+			<Identifier>InvalidDispenseStepXmlSchema</Identifier>
 			<Identifier>EmptySiLADispensingSteps</Identifier>
-			<Identifier>UnsupportedSourcePlate</Identifier>
+			<Identifier>UnknownSourcePlate</Identifier>
 			<Identifier>MoreThanOneSourcePlateDetected</Identifier>
 			<Identifier>NoSourcePlateDetected</Identifier>
-			<Identifier>NoLiquidClassInLiquidClassLibrary</Identifier>
-			<Identifier>NoLiquidClass</Identifier>
-			<Identifier>OutOfBoundSourcePlateRow</Identifier>
-			<Identifier>OutOfBoundSourcePlateColumn</Identifier>
-			<Identifier>OutOfBoundDispenseVolume</Identifier>
-			<Identifier>OutOfBoundTargetPlateXPosition</Identifier>
-			<Identifier>OutOfBoundTargetPlateYPosition</Identifier>
+			<Identifier>UnknownLiquidClass</Identifier>
+			<Identifier>MissingLiquidClass</Identifier>
+			<Identifier>OutOfBoundsSourcePlateRow</Identifier>
+			<Identifier>OutOfBoundsSourcePlateColumn</Identifier>
+			<Identifier>OutOfBoundsDispenseVolume</Identifier>
+			<Identifier>OutOfBoundsAdditionalVolume</Identifier>
+			<Identifier>OutOfBoundsTargetPlateXPosition</Identifier>
+			<Identifier>OutOfBoundsTargetPlateYPosition</Identifier>
 			<Identifier>TransferLiquidFailed</Identifier>
 		</DefinedExecutionErrors>
 	</Command>
@@ -126,54 +229,49 @@
 		<Description>No target plate detected.</Description>
 	</DefinedExecutionError>
 	<DefinedExecutionError>
-		<Identifier>UnsupportedSourcePlate</Identifier>
-		<DisplayName>Unsupported Source Plate</DisplayName>
-		<Description>The source plate format is unsupported.</Description>
+		<Identifier>UnknownSourcePlate</Identifier>
+		<DisplayName>Unknown Source Plate</DisplayName>
+		<Description>The source plate format is not supported.</Description>
 	</DefinedExecutionError>
 	<DefinedExecutionError>
-		<Identifier>UnsupportedTargetPlate</Identifier>
-		<DisplayName>Unsupported Target Plate</DisplayName>
-		<Description>The target plate format is unsupported.</Description>
+		<Identifier>UnknownTargetPlate</Identifier>
+		<DisplayName>Unknown Target Plate</DisplayName>
+		<Description>The target plate format is not supported.</Description>
 	</DefinedExecutionError>
 	<DefinedExecutionError>
-		<Identifier>NoSourcePlateInPlateFormatLibrary</Identifier>
-		<DisplayName>No Source Plate In Plate Format Library</DisplayName>
-		<Description>Source plate was not found in Plate Format Library.</Description>
-	</DefinedExecutionError>
-	<DefinedExecutionError>
-		<Identifier>NoTargetPlateInPlateFormatLibrary</Identifier>
-		<DisplayName>No Target Plate In Plate Format Library</DisplayName>
-		<Description>Target plate was not found in Plate Format Library.</Description>
-	</DefinedExecutionError>
-	<DefinedExecutionError>
-		<Identifier>NoLiquidClassInLiquidClassLibrary</Identifier>
-		<DisplayName>No Liquid Class In Liquid Class Library</DisplayName>
+		<Identifier>UnknownLiquidClass</Identifier>
+		<DisplayName>Unknown Liquid Class</DisplayName>
 		<Description>Liquid class was not found in Liquid Class Library.</Description>
 	</DefinedExecutionError>
 	<DefinedExecutionError>
-		<Identifier>OutOfBoundSourcePlateRow</Identifier>
+		<Identifier>OutOfBoundsSourcePlateRow</Identifier>
 		<DisplayName>Out Of Bound Source Plate Row</DisplayName>
 		<Description>Source plate row is either negative or greater than the number of available source plate rows.</Description>
 	</DefinedExecutionError>
 	<DefinedExecutionError>
-		<Identifier>OutOfBoundTargetPlateRow</Identifier>
+		<Identifier>OutOfBoundsTargetPlateRow</Identifier>
 		<DisplayName>Out Of Bound Target Plate Row</DisplayName>
 		<Description>Target plate row is either negative or greater than the number of available target plate rows.</Description>
 	</DefinedExecutionError>
 	<DefinedExecutionError>
-		<Identifier>OutOfBoundSourcePlateColumn</Identifier>
+		<Identifier>OutOfBoundsSourcePlateColumn</Identifier>
 		<DisplayName>Out Of Bound Source Plate Column</DisplayName>
 		<Description>Source plate column is either negative or greater than the number of available source plate columns.</Description>
 	</DefinedExecutionError>
 	<DefinedExecutionError>
-		<Identifier>OutOfBoundTargetPlateColumn</Identifier>
+		<Identifier>OutOfBoundsTargetPlateColumn</Identifier>
 		<DisplayName>Out Of Bound Target Plate Column</DisplayName>
 		<Description>Target plate column is either negative or greater than the number of available target plate columns.</Description>
 	</DefinedExecutionError>
 	<DefinedExecutionError>
-		<Identifier>OutOfBoundDispenseVolume</Identifier>
+		<Identifier>OutOfBoundsDispenseVolume</Identifier>
 		<DisplayName>Out Of Bound Dispense Volume</DisplayName>
 		<Description>Dispense volume is either negative or zero.</Description>
+	</DefinedExecutionError>
+	<DefinedExecutionError>
+		<Identifier>OutOfBoundsAdditionalVolume</Identifier>
+		<DisplayName>Out Of Bound Additional Volume</DisplayName>
+		<Description>Additional Volume should be positive .</Description>
 	</DefinedExecutionError>
 	<DefinedExecutionError>
 		<Identifier>TransferLiquidFailed</Identifier>
@@ -181,27 +279,27 @@
 		<Description>Error when trying to dispense liquid.</Description>
 	</DefinedExecutionError>
 	<DefinedExecutionError>
-		<Identifier>InvalidTrasnferXMLSchema</Identifier>
-		<DisplayName>Invalid Trasnfer XML Schema</DisplayName>
-		<Description>Invalid transfer XML schema.</Description>
+		<Identifier>InvalidDispenseStepXmlSchema</Identifier>
+		<DisplayName>Invalid Dispense Step XML Schema</DisplayName>
+		<Description>Invalid Dispense Step XML Schema.</Description>
 	</DefinedExecutionError>
 	<DefinedExecutionError>
 		<Identifier>EmptySiLADispensingSteps</Identifier>
 		<DisplayName>Empty SiLA Dispensing Steps</DisplayName>
-		<Description>No SiLA dispensing steps in the transfer XML.</Description>
+		<Description>No SiLA dispensing steps in the  Dispense Step XML.</Description>
 	</DefinedExecutionError>
 	<DefinedExecutionError>
-		<Identifier>NoLiquidClass</Identifier>
+		<Identifier>MissingLiquidClass</Identifier>
 		<DisplayName>No Liquid Class</DisplayName>
 		<Description>No liquid class found.</Description>
 	</DefinedExecutionError>
 	<DefinedExecutionError>
-		<Identifier>OutOfBoundTargetPlateXPosition</Identifier>
+		<Identifier>OutOfBoundsTargetPlateXPosition</Identifier>
 		<DisplayName>Out Of Bound Target Plate X Position</DisplayName>
 		<Description>out of bound target plate X position.</Description>
 	</DefinedExecutionError>
 	<DefinedExecutionError>
-		<Identifier>OutOfBoundTargetPlateYPosition</Identifier>
+		<Identifier>OutOfBoundsTargetPlateYPosition</Identifier>
 		<DisplayName>Out Of Bound Target Plate Y Position</DisplayName>
 		<Description>out of bound target plate Y position.</Description>
 	</DefinedExecutionError>
