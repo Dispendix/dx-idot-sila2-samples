@@ -170,7 +170,7 @@ public class ClientSample
     /// <param name="filePath">CSV protocol file path. This file should exist on the server side</param>
     public async Task DispenseProtocol(string filePath)
     {
-        Console.ForegroundColor = ConsoleColor.DarkMagenta;
+        Console.ForegroundColor = ConsoleColor.Yellow;
         try
         {
             var instrumentStatusInitial =
