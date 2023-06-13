@@ -61,7 +61,7 @@
 			more low-level access to the dispensing capabilities of the device than the Dispense Protocol Command.
 
 			IMPORTANT! This command enables direct control of the axis movement and can thereby cause damage if used without thorough understanding of the device,
-			and careful testing. We recommend to use DispenseProtocol for most users. Please refer to the I.DOT SiLA 2 Automation Guide to learn more how to use this command.
+			and careful testing. We recommend to use DispenseProtocol for most users.
 		</Description>
 		<Observable>Yes</Observable>
 		<Parameter>
@@ -171,7 +171,6 @@
 			</DataType>
 		</Parameter>
 		<DefinedExecutionErrors>
-			<Identifier>IncompatibleState</Identifier>
 			<Identifier>InvalidDispenseStepXmlSchema</Identifier>
 			<Identifier>EmptySiLADispensingSteps</Identifier>
 			<Identifier>UnknownSourcePlate</Identifier>
@@ -188,11 +187,6 @@
 			<Identifier>TransferLiquidFailed</Identifier>
 		</DefinedExecutionErrors>
 	</Command>
-	<DefinedExecutionError>
-		<Identifier>IncompatibleState</Identifier>
-		<DisplayName>Incompatible State</DisplayName>
-		<Description>I.DOT device must be in the Idle state to execute a command.</Description>
-	</DefinedExecutionError>
 	<DefinedExecutionError>
 		<Identifier>InvalidFileNamePath</Identifier>
 		<DisplayName>Invalid File Name Path</DisplayName>
