@@ -63,6 +63,102 @@ public class ClientSample
         // Initialize device and execute sample protocol
         InitIDotDevice(true).Wait();
         DispenseProtocol(filePath).Wait();
+        
+//          string fillVolumeXML = @"
+//  <?xml version=""1.0"" encoding=""utf-8""?>
+//  <FillVolumeSchema xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
+//      <SourcePlateType>
+//          <String>S.100 Plate</String>
+//      </SourcePlateType>
+//      <ArrayOfFillVolumes>
+//          <FillVolume>
+//              <FillVolumeParameter Name=""LiquidName"">
+//                  <String>Water</String>
+//              </FillVolumeParameter>
+//              <FillVolumeParameter Name=""FillVolume_µL"">
+//                  <Int>10</Int>
+//              </FillVolumeParameter>
+//          </FillVolume>
+//          <FillVolume>
+//              <FillVolumeParameter Name=""LiquidName"">
+//                  <String>DMSO</String>
+//              </FillVolumeParameter>
+//              <FillVolumeParameter Name=""FillVolume_µL"">
+//                  <Int>10</Int>
+//              </FillVolumeParameter>
+//          </FillVolume>
+//      </ArrayOfFillVolumes>
+//  </FillVolumeSchema>";
+//
+//          string transferLiquidXML = @"
+// <?xml version=""1.0"" encoding=""utf-8""?>
+// <ArrayOfSiLADispensingStep xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
+//     <SiLADispensingStep>
+//         <Parameter name=""SourcePlateType"">
+//             <String>S.100 Plate</String>
+//         </Parameter>
+//         <Parameter name=""SourceRow"">
+//             <Int>0</Int>
+//         </Parameter>
+//         <Parameter name=""SourceColumn"">
+//             <Int>0</Int>
+//         </Parameter>
+//         <Parameter name=""LiquidClassName"">
+//             <String>VSCY 0.95 (H2O, 1.0 mPa*s)</String>
+//         </Parameter>
+// 		<Parameter name=""LiquidName"">
+// 			<String>Water</String>
+// 		</Parameter>
+//         <Parameter name=""Volume_µL"">
+//             <Float>0.1</Float>
+//         </Parameter>
+//         <Parameter name=""AdditionalVolume_µL"">
+//             <Float>0</Float>
+//         </Parameter>
+//         <Parameter name=""TargetX_µm"">
+//             <!-- equals column 1 of 96 well plate  -->
+//             <Int>14500</Int>
+//         </Parameter>
+//         <Parameter name=""TargetY_µm"">
+//             <!-- equals row A of 96 well plate -->
+//             <Int>11250</Int>
+//         </Parameter>
+//     </SiLADispensingStep>
+//     <SiLADispensingStep>
+//         <Parameter name=""SourcePlateType"">
+//             <String>S.100 Plate</String>
+//         </Parameter>
+//         <Parameter name=""SourceRow"">
+//             <Int>1</Int>
+//         </Parameter>
+//         <Parameter name=""SourceColumn"">
+//             <Int>2</Int>
+//         </Parameter>
+//         <Parameter name=""LiquidClassName"">
+//             <String>VSCY 0.95 (H2O, 1.0 mPa*s)</String>
+//         </Parameter>
+// 		<Parameter name=""LiquidName"">
+// 			<String>Water</String>
+// 		</Parameter>
+//         <Parameter name=""Volume_µL"">
+//             <Float>0.2</Float>
+//         </Parameter>
+//         <Parameter name=""AdditionalVolume_µL"">
+//             <Float>0</Float>
+//         </Parameter>
+//         <Parameter name=""TargetX_µm"">
+//             <!-- equals column 2 of 96 well plate  -->
+//             <Int>29000</Int>
+//         </Parameter>
+//         <Parameter name=""TargetY_µm"">
+//             <!-- equals row B of 96 well plate -->
+//             <Int>22500</Int>
+//         </Parameter>
+//     </SiLADispensingStep>
+// </ArrayOfSiLADispensingStep>
+// ";
+//         SetFillVolume(fillVolumeXML).Wait();
+//         TransferLiquid(transferLiquidXML, false).Wait();
     }
 
     /// <summary>
@@ -209,6 +305,126 @@ public class ClientSample
             Console.ForegroundColor = ConsoleColor.DarkRed;
             string error = ErrorHandling.HandleException(e);
             Console.WriteLine(error);
+        }
+    }
+    
+    public async Task SetFillVolume(string filePath)
+    {
+        try
+        {
+            var instrumentStatus =
+                _instrumentStatusProviderClient.Get_InstrumentStatus(new Instrumentstatusprovider.Get_InstrumentStatus_Parameters());
+            if (instrumentStatus.InstrumentStatus.Value != "Idle")
+            {
+                Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                Console.WriteLine("I.DOT to execute a protocol  should be in the Idle state.");
+                return;
+            }
+            
+            var xml = string.Empty;
+            using (var reader = new StreamReader(filePath))
+            {
+                xml = reader.ReadToEnd();
+            }
+    
+            //This command runs asynchronously. To query the result or get the execution status you can use the return Command Execution UUID
+            CommandExecutionUUID? commandID = _dispensingServiceClient
+                                              .SetFillVolume(new DispensingService.SetFillVolume_Parameters()
+                                              {
+                                                 FillVolumes = new Sila2.Org.Silastandard.String() { Value = xml }
+                                              })
+                                              .CommandExecutionUUID;
+    
+            // Wait for command execution to finish
+            using (AsyncServerStreamingCall<ExecutionInfo>? call = _dispensingServiceClient.SetFillVolume_Info(commandID))
+            {
+                IAsyncStreamReader<ExecutionInfo>? responseStream = call.ResponseStream;
+                var cancellationToken = new CancellationTokenSource();
+    
+                while (await responseStream.MoveNext(cancellationToken.Token))
+                {
+                    // Query the dispense progress status and display it in the console
+                    ExecutionInfo? currentExecutionInfo = responseStream.Current;
+                    string? message =
+                        $"--> Command DispenseProtocol    -status: {currentExecutionInfo.CommandStatus}   -remaining time: {currentExecutionInfo.EstimatedRemainingTime?.Seconds,3:###}s    -progress: {currentExecutionInfo.ProgressInfo.Value}";
+                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                    Console.WriteLine(message);
+    
+                    if (currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedSuccessfully ||
+                        currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedWithError)
+                    {
+                        break;
+                    }
+                }
+            }
+    
+            _dispensingServiceClient.SetFillVolume_Result(commandID);
+        }
+        catch (Exception e)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            string error = ErrorHandling.HandleException(e);
+            Console.WriteLine(error);
+        }
+    }
+    
+
+    public async Task TransferLiquid(string dispenseXmlSchema, bool optimizeDispenseStepOrder)
+    {
+         try
+        {
+            var instrumentStatus =
+                _instrumentStatusProviderClient.Get_InstrumentStatus(new Instrumentstatusprovider.Get_InstrumentStatus_Parameters());
+            if (instrumentStatus.InstrumentStatus.Value != "Idle")
+            {
+                Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                Console.WriteLine("I.DOT to execute a protocol  should be in the Idle state.");
+                return;
+            }
+
+            //This command runs asynchronously. To query the result or get the execution status you can use the return Command Execution UUID
+            CommandExecutionUUID? commandID = _dispensingServiceClient
+                                              .TransferLiquid(new DispensingService.TransferLiquid_Parameters()
+                                              {
+                                                  //FileNamePath = new Sila2.Org.Silastandard.String() { Value = filePath }
+                                                  DispenseStepXmlSchema = new String(){Value = dispenseXmlSchema},
+                                                  OptimizeDispenseStepOrder = new Boolean() { Value = optimizeDispenseStepOrder }
+                                              })
+                                              .CommandExecutionUUID;
+
+            // Wait for command execution to finish
+            using (AsyncServerStreamingCall<ExecutionInfo>? call = _dispensingServiceClient.TransferLiquid_Info(commandID))
+            {
+                IAsyncStreamReader<ExecutionInfo>? responseStream = call.ResponseStream;
+                var cancellationToken = new CancellationTokenSource();
+
+                while (await responseStream.MoveNext(cancellationToken.Token))
+                {
+                    // Query the dispense progress status and display it in the console
+                    ExecutionInfo? currentExecutionInfo = responseStream.Current;
+                    string? message =
+                        $"--> Command TransferLiquid   -status: {currentExecutionInfo.CommandStatus}   -remaining time: {currentExecutionInfo.EstimatedRemainingTime?.Seconds,3:###}s    -progress: {currentExecutionInfo.ProgressInfo.Value}";
+                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                    Console.WriteLine(message);
+
+                    if (currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedSuccessfully ||
+                        currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedWithError)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            DispensingService.TransferLiquid_Responses? response = _dispensingServiceClient.TransferLiquid_Result(commandID);
+            Console.WriteLine(response.TransferLiquidResult.Value);
+            Console.WriteLine("\n");
+        }
+        catch (Exception e)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            string error = ErrorHandling.HandleException(e);
+            Console.WriteLine(error);
+            Console.WriteLine("\n");
         }
     }
 

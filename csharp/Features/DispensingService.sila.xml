@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<Feature SiLA2Version="1.0" FeatureVersion="1.0" MaturityLevel="Draft" Originator="dx.idot.sila"
-         Category="dispensing"
-         xmlns="http://www.sila-standard.org"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://www.sila-standard.org https://gitlab.com/SiLA2/sila_base/raw/master/schema/FeatureDefinition.xsd">
+<Feature SiLA2Version="1.0" FeatureVersion="1.1" MaturityLevel="Draft" Originator="dx.idot.sila"
+		 Category="dispensing"
+		 xmlns="http://www.sila-standard.org"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://www.sila-standard.org https://gitlab.com/SiLA2/sila_base/raw/master/schema/FeatureDefinition.xsd">
 
 	<Identifier>DispensingService</Identifier>
 	<DisplayName>Dispensing Service</DisplayName>
@@ -87,7 +87,10 @@
 							<Int>0</Int>
 						</Parameter>
 						<Parameter name="LiquidClassName">
-							<String>H2O</String>
+							<String>VSCY 0.95 (H2O, 1.0 mPa*s)</String>
+						</Parameter>
+						<Parameter name="LiquidName">
+							<String>Water</String>
 						</Parameter>
 						<Parameter name="Volume_µL">
 							<Float>0.1</Float>
@@ -115,7 +118,7 @@
 							<Int>2</Int>
 						</Parameter>
 						<Parameter name="LiquidClassName">
-							<String>H2O</String>
+							<String>VSCY 0.95 (H2O, 1.0 mPa*s)</String>
 						</Parameter>
 						<Parameter name="Volume_µL">
 							<Float>0.2</Float>
@@ -170,6 +173,39 @@
 				<Basic>Boolean</Basic>
 			</DataType>
 		</Parameter>
+		<Response>
+			<Identifier>TransferLiquidResult</Identifier>
+			<DisplayName>Transfer Liquid Result</DisplayName>
+			<Description>All The Data In XML Format Produced After A Dispensing Execution From TransferLiquid Command.
+				schema look like below:
+				<!--
+					<?xml version="1.0" encoding="utf-16" standalone="no"?> 
+							<ArrayOfDispensingResult xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"> 
+    							<DispensingResult> 
+        						<Step>1</Step> 
+        							<TargetDrop>3</TargetDrop> 
+        							<DetectedDrop>3</DetectedDrop> 
+        							<Timestamp>2024-04-23T15:06:53.3815922+07:00</Timestamp> 
+    							</DispensingResult> 
+    							<DispensingResult> 
+        						<Step>2</Step> 
+        							<TargetDrop>5</TargetDrop> 
+        							<DetectedDrop>5</DetectedDrop> 
+        							<Timestamp>2024-04-23T15:06:54.9375445+07:00</Timestamp> 
+ 									</DispensingResult> 
+									<DispensingResult> 
+        						<Step>3</Step> 
+        							<TargetDrop>4</TargetDrop> 
+        							<DetectedDrop>4</DetectedDrop> 
+        							<Timestamp>2024-04-23T15:06:55.9375445+07:00</Timestamp> 
+    							</DispensingResult> 
+							</ArrayOfDispensingResult> 
+				-->
+			</Description>
+			<DataType>
+				<Basic>String</Basic>
+			</DataType>
+		</Response>
 		<DefinedExecutionErrors>
 			<Identifier>InvalidDispenseStepXmlSchema</Identifier>
 			<Identifier>EmptySiLADispensingSteps</Identifier>
@@ -186,6 +222,55 @@
 			<Identifier>OutOfBoundsTargetPlateYPosition</Identifier>
 			<Identifier>TransferLiquidFailed</Identifier>
 		</DefinedExecutionErrors>
+	</Command>
+	<Command>
+		<Identifier>SetFillVolume</Identifier>
+		<DisplayName>Set Liquids Fill Volumes</DisplayName>
+		<Description>
+			Sets the fill volume for the specified liquid class. The fill volume determines how much liquid is dispensed when the liquid class is used in a Transfer Liquid and Dispense Protocol command.
+			It helps calculate the time required to dispense a given volume of liquid. The fill volume is influenced by the liquid class and the source plate used, and is measured in microliters (µL).
+		</Description>
+		<Observable>Yes</Observable>
+		<Parameter>
+			<Identifier>FillVolumes</Identifier>
+			<DisplayName>Fill volumes</DisplayName>
+			<Description>
+				An XML formatted array of fill volume parameters describes the fill volume XML Schema.
+
+				Below is a valid example of the fill volume parameter XML Schema. To use it, remove the comment markup enclosing the example and the "/" within some of the elements.
+
+				If the Source Well is not defined, the FillVolume_µL for the specified liquid name will be used for all wells in the source plate.
+				<!--
+<?xml version="1.0" encoding="utf-8"?>
+<FillVolumeSchema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<SourcePlateType>
+		<String>S.100 Plate</String>
+	</SourcePlateType>
+	<ArrayOfFillVolumes>
+		<FillVolume>
+			<FillVolumeParameter Name="LiquidName">
+				<String>Water</String>
+			</FillVolumeParameter>
+			<FillVolumeParameter Name="FillVolume_µL">
+				<Int>10</Int>
+			</FillVolumeParameter>
+		</FillVolume>
+		<FillVolume>
+			<FillVolumeParameter Name="LiquidName">
+				<String>DMSO</String>
+			</FillVolumeParameter>
+			<FillVolumeParameter Name="FillVolume_µL">
+				<Int>10</Int>
+			</FillVolumeParameter>
+		</FillVolume>
+	</ArrayOfFillVolumes>
+</FillVolumeSchema>
+				-->
+			</Description>
+			<DataType>
+				<Basic>String</Basic>
+			</DataType>
+		</Parameter>
 	</Command>
 	<DefinedExecutionError>
 		<Identifier>InvalidFileNamePath</Identifier>
