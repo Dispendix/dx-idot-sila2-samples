@@ -16,6 +16,7 @@ using Boolean = Sila2.Org.Silastandard.Boolean;
 using Microsoft.Extensions.DependencyInjection;
 using Sila2.Org.Silastandard.Core.Errorrecoveryservice.V1;
 using SiLA2.Server.Utils;
+using String = Sila2.Org.Silastandard.String;
 
 public class ClientSample
 {
@@ -64,101 +65,61 @@ public class ClientSample
         InitIDotDevice(true).Wait();
         DispenseProtocol(filePath).Wait();
         
-//          string fillVolumeXML = @"
-//  <?xml version=""1.0"" encoding=""utf-8""?>
-//  <FillVolumeSchema xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
-//      <SourcePlateType>
-//          <String>S.100 Plate</String>
-//      </SourcePlateType>
-//      <ArrayOfFillVolumes>
-//          <FillVolume>
-//              <FillVolumeParameter Name=""LiquidName"">
-//                  <String>Water</String>
-//              </FillVolumeParameter>
-//              <FillVolumeParameter Name=""FillVolume_µL"">
-//                  <Int>10</Int>
-//              </FillVolumeParameter>
-//          </FillVolume>
-//          <FillVolume>
-//              <FillVolumeParameter Name=""LiquidName"">
-//                  <String>DMSO</String>
-//              </FillVolumeParameter>
-//              <FillVolumeParameter Name=""FillVolume_µL"">
-//                  <Int>10</Int>
-//              </FillVolumeParameter>
-//          </FillVolume>
-//      </ArrayOfFillVolumes>
-//  </FillVolumeSchema>";
+        // Uncomment the following lines to execute the SetFillVolume and TransferLiquid commands
+//           string fillVolumeXML = @"<?xml version=""1.0"" encoding=""utf-8""?>
+// <FillVolumeSchema xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
+//     <SourcePlateType>
+//         <String>S.100 Plate</String>
+//     </SourcePlateType>
+//     <ArrayOfFillVolumes>
+//         <FillVolume>
+//             <FillVolumeParameter Name=""LiquidName"">
+//                 <String>DMSO</String>
+//             </FillVolumeParameter>
+//             <FillVolumeParameter Name=""FillVolume_µL"">
+//                 <Float>80</Float>
+//             </FillVolumeParameter>
+//         </FillVolume>
+//     </ArrayOfFillVolumes>
+// </FillVolumeSchema>";
 //
-//          string transferLiquidXML = @"
-// <?xml version=""1.0"" encoding=""utf-8""?>
+//          string transferLiquidXML = @"<?xml version=""1.0"" encoding=""utf-8""?>
 // <ArrayOfSiLADispensingStep xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
-//     <SiLADispensingStep>
-//         <Parameter name=""SourcePlateType"">
-//             <String>S.100 Plate</String>
-//         </Parameter>
-//         <Parameter name=""SourceRow"">
-//             <Int>0</Int>
-//         </Parameter>
-//         <Parameter name=""SourceColumn"">
-//             <Int>0</Int>
-//         </Parameter>
-//         <Parameter name=""LiquidClassName"">
-//             <String>VSCY 0.95 (H2O, 1.0 mPa*s)</String>
-//         </Parameter>
-// 		<Parameter name=""LiquidName"">
-// 			<String>Water</String>
+// 	<SiLADispensingStep>
+// 		<Parameter name=""SourcePlateType"">
+// 			<String>S.100 Plate</String>
 // 		</Parameter>
-//         <Parameter name=""Volume_µL"">
-//             <Float>0.1</Float>
-//         </Parameter>
-//         <Parameter name=""AdditionalVolume_µL"">
-//             <Float>0</Float>
-//         </Parameter>
-//         <Parameter name=""TargetX_µm"">
-//             <!-- equals column 1 of 96 well plate  -->
-//             <Int>14500</Int>
-//         </Parameter>
-//         <Parameter name=""TargetY_µm"">
-//             <!-- equals row A of 96 well plate -->
-//             <Int>11250</Int>
-//         </Parameter>
-//     </SiLADispensingStep>
-//     <SiLADispensingStep>
-//         <Parameter name=""SourcePlateType"">
-//             <String>S.100 Plate</String>
-//         </Parameter>
-//         <Parameter name=""SourceRow"">
-//             <Int>1</Int>
-//         </Parameter>
-//         <Parameter name=""SourceColumn"">
-//             <Int>2</Int>
-//         </Parameter>
-//         <Parameter name=""LiquidClassName"">
-//             <String>VSCY 0.95 (H2O, 1.0 mPa*s)</String>
-//         </Parameter>
-// 		<Parameter name=""LiquidName"">
-// 			<String>Water</String>
+// 		<Parameter name=""SourceRow"">
+// 			<Int>0</Int>
 // 		</Parameter>
-//         <Parameter name=""Volume_µL"">
-//             <Float>0.2</Float>
-//         </Parameter>
-//         <Parameter name=""AdditionalVolume_µL"">
-//             <Float>0</Float>
-//         </Parameter>
-//         <Parameter name=""TargetX_µm"">
-//             <!-- equals column 2 of 96 well plate  -->
-//             <Int>29000</Int>
-//         </Parameter>
-//         <Parameter name=""TargetY_µm"">
-//             <!-- equals row B of 96 well plate -->
-//             <Int>22500</Int>
-//         </Parameter>
-//     </SiLADispensingStep>
+// 		<Parameter name=""SourceColumn"">
+// 			<Int>0</Int>
+// 		</Parameter>
+// 		<Parameter name=""LiquidClassName"">
+// 			<String>DMSO</String>
+// 		</Parameter>
+// 		<Parameter name=""LiquidName"">
+// 			<String>DMSO</String>
+// 		</Parameter>
+// 		<Parameter name=""Volume_µL"">
+// 			<Float>0.03526</Float>
+// 		</Parameter>
+// 		<Parameter name=""AdditionalVolume_µL"">
+// 			<Int>0</Int>
+// 		</Parameter>
+// 		<Parameter name=""TargetX_µm"">
+// 			<!-- equals column 1 of 96 well plate  -->
+// 			<Int>14500</Int>
+// 		</Parameter>
+// 		<Parameter name=""TargetY_µm"">
+// 			<!-- equals row A of 96 well plate -->
+// 			<Int>11250</Int>
+// 		</Parameter>
+// 	</SiLADispensingStep>
 // </ArrayOfSiLADispensingStep>
 // ";
-//         SetFillVolume(fillVolumeXML).Wait();
-//         TransferLiquid(transferLiquidXML, false).Wait();
+//          SetFillVolume(fillVolumeXML).Wait();
+//          TransferLiquid(transferLiquidXML, false).Wait();
     }
 
     /// <summary>
@@ -308,7 +269,7 @@ public class ClientSample
         }
     }
     
-    public async Task SetFillVolume(string filePath)
+    public async Task SetFillVolume(string xmlSchema)
     {
         try
         {
@@ -320,18 +281,12 @@ public class ClientSample
                 Console.WriteLine("I.DOT to execute a protocol  should be in the Idle state.");
                 return;
             }
-            
-            var xml = string.Empty;
-            using (var reader = new StreamReader(filePath))
-            {
-                xml = reader.ReadToEnd();
-            }
     
             //This command runs asynchronously. To query the result or get the execution status you can use the return Command Execution UUID
             CommandExecutionUUID? commandID = _dispensingServiceClient
                                               .SetFillVolume(new DispensingService.SetFillVolume_Parameters()
                                               {
-                                                 FillVolumes = new Sila2.Org.Silastandard.String() { Value = xml }
+                                                 FillVolumes = new Sila2.Org.Silastandard.String() { Value = xmlSchema }
                                               })
                                               .CommandExecutionUUID;
     
