@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<Feature SiLA2Version="1.0" FeatureVersion="1.1" MaturityLevel="Draft" Originator="dx.idot.sila"
+<Feature SiLA2Version="1.0" FeatureVersion="1.3" MaturityLevel="Draft" Originator="dx.idot.sila"
 		 Category="dispensing"
 		 xmlns="http://www.sila-standard.org"
 		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
