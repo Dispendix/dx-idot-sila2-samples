@@ -17,6 +17,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Sila2.Org.Silastandard.Core.Errorrecoveryservice.V1;
 using SiLA2.Server.Utils;
 using String = Sila2.Org.Silastandard.String;
+using System.ComponentModel.Design;
+using IDot.SiLA2.Samples.CSharp;
+using System.Diagnostics;
 
 public class ClientSample
 {
@@ -30,6 +33,7 @@ public class ClientSample
     private readonly ShutdownController.ShutdownController.ShutdownControllerClient _shutdownControllerClient;
     private readonly ErrorRecoveryService.ErrorRecoveryServiceClient _errorRecoveryClient;
     private readonly SiLAService.SiLAService.SiLAServiceClient _siLAServiceClient;
+    private readonly IDOTWrapper _instrument;
     private static IConfigurationRoot _configuration;
 
     public ClientSample()
@@ -50,76 +54,78 @@ public class ClientSample
 
         _siLAServiceClient = new SiLAService.SiLAService.SiLAServiceClient(serverChannel);
 
-        try
+        _instrument = new IDOTWrapper(_initializationControllerClient, _instrumentStatusProviderClient, _plateTrayControllerClient, _siLAServiceClient);
+
+        Console.WriteLine("Initializing I.DOT: the instrument will restart, don't panic");
+        _instrument.Initialize(false).Wait();
+        Console.WriteLine(_instrument.GetVersion());
+
+        while(true)
         {
-            var serverVersion = _siLAServiceClient.Get_ServerVersion(new SiLAService.Get_ServerVersion_Parameters());
-            Console.WriteLine($"Server Service Version: {serverVersion}");
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine("I.DOT SiLA2 client sample can not connect to the I.DOT SiLA2 server.");
-            return;
+            Console.WriteLine("Choose what to do (type the number and press <Enter>)");
+            Console.WriteLine("1. Source Tray Stress Test");
+            Console.WriteLine("2. Target Tray Stress Test");
+            Console.WriteLine("3. Both Tray Stress Test");
+            string? input = Console.ReadLine();
+            if (input == null || input.Length ==0 ) {
+                Console.WriteLine("unrecognized input");
+                continue;
+            }
+
+            else {
+                Console.Clear();
+                Console.WriteLine("How many cycles ?");
+                string? targetCycles = Console.ReadLine();
+                Console.Clear();
+                Int64 cycle = Int64.Parse(targetCycles);
+                if (input.Trim() == "1")
+                {
+                    var tmr = Stopwatch.StartNew();
+                    tmr.Start();
+                    for (int i = 0; i < cycle; i++){
+                        Console.WriteLine($"Executing Source Tray Stress Test cycle {i}/{cycle}");
+                        _instrument.EjectTray(TrayType.Source).Wait();
+                        _instrument.RetractTrays().Wait();
+                        Console.Clear();
+                    }
+                    tmr.Stop();
+                    Console.WriteLine($"Done in {tmr.Elapsed.TotalSeconds} second(s)");
+                }
+                else if (input.Trim() == "2")
+                {
+                    var tmr = Stopwatch.StartNew();
+                    tmr.Start();
+                    for (int i = 0; i < cycle; i++)
+                    {
+                        Console.WriteLine($"Executing Target Tray Stress Test cycle {i}/{cycle}");
+                        _instrument.EjectTray(TrayType.Target).Wait();
+                        _instrument.RetractTrays().Wait();
+                        Console.Clear();
+                    }
+                    Console.WriteLine($"Done in {tmr.Elapsed.TotalSeconds} second(s)");
+                }
+                else if (input.Trim() == "3")
+                {
+                    var tmr = Stopwatch.StartNew();
+                    tmr.Start();
+                    for (int i = 0; i < cycle; i++)
+                    {
+                        Console.WriteLine($"Executing Both Tray Stress Test cycle {i}/{cycle}");
+                        _instrument.EjectTray(TrayType.Target).Wait();
+                        _instrument.EjectTray(TrayType.Source).Wait();
+                        _instrument.RetractTrays().Wait();
+                        Console.Clear();
+                    }
+                    Console.WriteLine($"Done in {tmr.Elapsed.TotalSeconds} second(s)");
+                }
+
+                else
+                {
+                    Console.WriteLine("unrecognized input");
+                }
+            }
         }
 
-        // Initialize device and execute sample protocol
-        InitIDotDevice(true).Wait();
-        DispenseProtocol(filePath).Wait();
-        
-        // Uncomment the following lines to execute the SetFillVolume and TransferLiquid commands
-//           string fillVolumeXML = @"<?xml version=""1.0"" encoding=""utf-8""?>
-// <FillVolumeSchema xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
-//     <SourcePlateType>
-//         <String>S.100 Plate</String>
-//     </SourcePlateType>
-//     <ArrayOfFillVolumes>
-//         <FillVolume>
-//             <FillVolumeParameter Name=""LiquidName"">
-//                 <String>DMSO</String>
-//             </FillVolumeParameter>
-//             <FillVolumeParameter Name=""FillVolume_µL"">
-//                 <Float>80</Float>
-//             </FillVolumeParameter>
-//         </FillVolume>
-//     </ArrayOfFillVolumes>
-// </FillVolumeSchema>";
-//
-//          string transferLiquidXML = @"<?xml version=""1.0"" encoding=""utf-8""?>
-// <ArrayOfSiLADispensingStep xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
-// 	<SiLADispensingStep>
-// 		<Parameter name=""SourcePlateType"">
-// 			<String>S.100 Plate</String>
-// 		</Parameter>
-// 		<Parameter name=""SourceRow"">
-// 			<Int>0</Int>
-// 		</Parameter>
-// 		<Parameter name=""SourceColumn"">
-// 			<Int>0</Int>
-// 		</Parameter>
-// 		<Parameter name=""LiquidClassName"">
-// 			<String>DMSO</String>
-// 		</Parameter>
-// 		<Parameter name=""LiquidName"">
-// 			<String>DMSO</String>
-// 		</Parameter>
-// 		<Parameter name=""Volume_µL"">
-// 			<Float>0.03526</Float>
-// 		</Parameter>
-// 		<Parameter name=""AdditionalVolume_µL"">
-// 			<Int>0</Int>
-// 		</Parameter>
-// 		<Parameter name=""TargetX_µm"">
-// 			<!-- equals column 1 of 96 well plate  -->
-// 			<Int>14500</Int>
-// 		</Parameter>
-// 		<Parameter name=""TargetY_µm"">
-// 			<!-- equals row A of 96 well plate -->
-// 			<Int>11250</Int>
-// 		</Parameter>
-// 	</SiLADispensingStep>
-// </ArrayOfSiLADispensingStep>
-// ";
-//          SetFillVolume(fillVolumeXML).Wait();
-//          TransferLiquid(transferLiquidXML, false).Wait();
     }
 
     /// <summary>
@@ -186,14 +192,16 @@ public class ClientSample
     {
         try
         {
+            Console.WriteLine("I'm trying");
             CommandConfirmation? commandReset =
                 _initializationControllerClient.Reset(new InitializationController.Reset_Parameters { SimulationMode = new Boolean { Value = simulationMod } });
-
+            Console.WriteLine("I'm halfway trying");
             using (AsyncServerStreamingCall<ExecutionInfo>? call = _initializationControllerClient.Reset_Info(commandReset.CommandExecutionUUID))
             {
                 await WaitForExecutionCommend(call);
                 _initializationControllerClient.Reset_Result(commandReset.CommandExecutionUUID);
             }
+            Console.WriteLine("I'm finsihed");
 
             CommandConfirmation? commandInitialize = _initializationControllerClient.Initialize(new InitializationController.Initialize_Parameters());
             using (AsyncServerStreamingCall<ExecutionInfo>? call = _initializationControllerClient.Initialize_Info(commandInitialize.CommandExecutionUUID))
@@ -209,6 +217,7 @@ public class ClientSample
             Console.WriteLine(error);
             throw;
         }
+        Console.WriteLine("finish init");
     }
 
     /// <summary>
@@ -322,7 +331,103 @@ public class ClientSample
             Console.WriteLine(error);
         }
     }
-    
+
+    public async Task SourceTrayStressTest(int repetition)
+    {
+        try
+        {
+            var instrumentStatus = _instrumentStatusProviderClient.Get_InstrumentStatus(new Instrumentstatusprovider.Get_InstrumentStatus_Parameters());
+            if (instrumentStatus.InstrumentStatus.Value != "Idle")
+            {
+                Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                Console.WriteLine("Cannot Execute Source Tray Stress Test: Instrument must be Idle");
+                return;
+            }
+            for (int i = 0; i < repetition; i++)
+            {
+                Console.WriteLine($"Ejecting Tray\t{i + 1}");
+                var commandUUID = _plateTrayControllerClient.EjectTray(new PlateLoadingController.EjectTray_Parameters()
+                {
+                    PlateTray = new PlateLoadingController.DataType_TrayType()
+                    {
+                        TrayType = new String() { Value = "Source" }
+                    }
+                }).CommandExecutionUUID;
+                _plateTrayControllerClient.EjectTray_Info(commandUUID);
+
+                // Wait for command execution to finish
+                using (AsyncServerStreamingCall<ExecutionInfo>? call = _plateTrayControllerClient.EjectTray_Info(commandUUID))
+                {
+                    IAsyncStreamReader<ExecutionInfo>? responseStream = call.ResponseStream;
+                    var cancellationToken = new CancellationTokenSource();
+
+                    while (await responseStream.MoveNext(cancellationToken.Token))
+                    {
+                        // Query the dispense progress status and display it in the console
+                        ExecutionInfo? currentExecutionInfo = responseStream.Current;
+                        string? message =
+                            $"--> Command Eject Tray Soiurce   -status: {currentExecutionInfo.CommandStatus}   -remaining time: {currentExecutionInfo.EstimatedRemainingTime?.Seconds,3:###}s    -progress: {currentExecutionInfo.ProgressInfo.Value}";
+                        Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                        Console.WriteLine(message);
+
+                        if (currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedSuccessfully ||
+                            currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedWithError)
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                var  response = _plateTrayControllerClient.EjectTray_Result(commandUUID);
+                Console.WriteLine(response);
+                Console.WriteLine("\n");
+
+
+
+                Console.WriteLine($"Retract Tray\t{i + 1}");
+                commandUUID = _plateTrayControllerClient.RetractTrays(new PlateLoadingController.RetractTrays_Parameters()
+                {
+                    
+                }).CommandExecutionUUID;
+                _plateTrayControllerClient.RetractTrays_Info(commandUUID);
+
+                // Wait for command execution to finish
+                using (AsyncServerStreamingCall<ExecutionInfo>? call = _plateTrayControllerClient.RetractTrays_Info(commandUUID))
+                {
+                    IAsyncStreamReader<ExecutionInfo>? responseStream = call.ResponseStream;
+                    var cancellationToken = new CancellationTokenSource();
+
+                    while (await responseStream.MoveNext(cancellationToken.Token))
+                    {
+                        // Query the dispense progress status and display it in the console
+                        ExecutionInfo? currentExecutionInfo = responseStream.Current;
+                        string? message =
+                            $"--> Command Retract Trays   -status: {currentExecutionInfo.CommandStatus}   -remaining time: {currentExecutionInfo.EstimatedRemainingTime?.Seconds,3:###}s    -progress: {currentExecutionInfo.ProgressInfo.Value}";
+                        Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                        Console.WriteLine(message);
+
+                        if (currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedSuccessfully ||
+                            currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedWithError)
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                var responseRet = _plateTrayControllerClient.RetractTrays_Result(commandUUID);
+                Console.WriteLine(response);
+                Console.WriteLine("\n");
+            }
+
+        }
+        catch (Exception e)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            string error = ErrorHandling.HandleException(e);
+            Console.WriteLine(error);
+            throw;
+        }
+    }
 
     public async Task TransferLiquid(string dispenseXmlSchema, bool optimizeDispenseStepOrder)
     {

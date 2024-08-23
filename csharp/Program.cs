@@ -5,7 +5,6 @@
         public static void Main(string[] args)
         {
             new ClientSample();
-
             Console.ReadKey();
         }
         
