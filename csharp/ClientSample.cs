@@ -64,7 +64,7 @@ public class ClientSample
 
         // Initialize device and execute sample protocol
 
-        InitIDotDevice(true).Wait();
+        InitIDotDevice(false).Wait();
         int i = 1;
         while(true)
         { 
@@ -73,6 +73,7 @@ public class ClientSample
             OpenTray("Target").Wait();
             CloseTray().Wait();
             DispenseProtocol(filePath, true).Wait();
+            CheckStatus("Idle");
             i = i + 1;
         }
     }
@@ -253,7 +254,7 @@ public class ClientSample
                                               .DispenseProtocol(new DispensingService.DispenseProtocol_Parameters()
                                               {
                                                   FileNamePath = new Sila2.Org.Silastandard.String() { Value = filePath },
-                                                  MonitorDispenseProgress = new Boolean() {Value = stressTestDispensing }
+                                                  MonitorDispenseProgress = new Boolean() {Value = !stressTestDispensing }
                                               })
                                               .CommandExecutionUUID;
 
@@ -285,10 +286,15 @@ public class ClientSample
             else
             {
                 // wait for the server to execute first
-                Thread.Sleep(1000);
+                Console.Write("wait for the server to execute first");
+                Thread.Sleep(5000);
 
-                while (_dispensingServiceClient.Get_DispensingStatus(new DispensingService.Get_DispensingStatus_Parameters()).DispensingStatus.Value)
+                bool dispensingstatus = true;
+                while (dispensingstatus)
                 {
+                    dispensingstatus = _dispensingServiceClient
+                        .Get_DispensingStatus(new DispensingService.Get_DispensingStatus_Parameters()).DispensingStatus
+                        .Value;
                     Thread.Sleep(200);
                 }
 
