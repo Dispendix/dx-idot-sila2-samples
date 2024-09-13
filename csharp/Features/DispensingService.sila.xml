@@ -33,17 +33,6 @@
         <Basic>String</Basic>
       </DataType>
     </Parameter>
-    <Parameter>
-      <Identifier>MonitorDispenseProgress</Identifier>
-      <DisplayName>Monitor Dispense Progress</DisplayName>
-      <Description>
-        Determine whether to monitor dispense progress with SiLA 2 stream.
-        For series of dispense protocol command calls, set this paramater to false and use Get Instrument Status instead
-      </Description>
-      <DataType>
-        <Basic>Boolean</Basic>
-      </DataType>
-    </Parameter>
     <Response>
       <Identifier>DispenseProtocolResult</Identifier>
       <DisplayName>>Dispense Protocol Result</DisplayName>
@@ -95,69 +84,69 @@
         comment markup that's within some of the elements.
 
         <!--
-				<?xml version="1.0" encoding="utf-8"?>
-				<ArrayOfSiLADispensingStep xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-					<SiLADispensingStep>
-						<Parameter name="SourcePlateType">
-							<String>S.100 Plate</String>
-						</Parameter>
-						<Parameter name="SourceRow">
-							<Int>0</Int>
-						</Parameter>
-						<Parameter name="SourceColumn">
-							<Int>0</Int>
-						</Parameter>
-						<Parameter name="LiquidClassName">
-							<String>VSCY 0.95 (H2O, 1.0 mPa*s)</String>
-						</Parameter>
-						<Parameter name="LiquidName">
-							<String>Water</String>
-						</Parameter>
-						<Parameter name="Volume_µL">
-							<Float>0.1</Float>
-						</Parameter>
-						<Parameter name="AdditionalVolume_µL">
-							<Float>0</Float>
-						</Parameter>
-						<Parameter name="TargetX_µm">
-							<!-/- equals column 1 of 96 well plate  -/->
-								<Int>14500</Int>
-						</Parameter>
-						<Parameter name="TargetY_µm">
-							<!-/- equals row A of 96 well plate -/->
-								<Int>11250</Int>
-						</Parameter>
-					</SiLADispensingStep>
-					<SiLADispensingStep>
-						<Parameter name="SourcePlateType">
-							<String>S.100 Plate</String>
-						</Parameter>
-						<Parameter name="SourceRow">
-							<Int>1</Int>
-						</Parameter>
-						<Parameter name="SourceColumn">
-							<Int>2</Int>
-						</Parameter>
-						<Parameter name="LiquidClassName">
-							<String>VSCY 0.95 (H2O, 1.0 mPa*s)</String>
-						</Parameter>
-						<Parameter name="Volume_µL">
-							<Float>0.2</Float>
-						</Parameter>
-						<Parameter name="AdditionalVolume_µL">
-							<Float>0</Float>
-						</Parameter>
-						<Parameter name="TargetX_µm">
-							<!-/- equals column 2 of 96 well plate  -/->
-								<Int>29000</Int>
-						</Parameter>
-						<Parameter name="TargetY_µm">
-							<!-/- equals row B of 96 well plate -/->
-								<Int>22500</Int>
-						</Parameter>
-					</SiLADispensingStep>
-				</ArrayOfSiLADispensingStep>
-				-->
+        <?xml version="1.0" encoding="utf-8"?>
+        <ArrayOfSiLADispensingStep xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+            <SiLADispensingStep>
+                <Parameter name="SourcePlateType">
+                    <String>S.100 Plate</String>
+                </Parameter>
+                <Parameter name="SourceRow">
+                    <Int>0</Int>
+                </Parameter>
+                <Parameter name="SourceColumn">
+                    <Int>0</Int>
+                </Parameter>
+                <Parameter name="LiquidClassName">
+                    <String>VSCY 0.95 (H2O, 1.0 mPa*s)</String>
+                </Parameter>
+                <Parameter name="LiquidName">
+                    <String>Water</String>
+                </Parameter>
+                <Parameter name="Volume_µL">
+                    <Float>0.1</Float>
+                </Parameter>
+                <Parameter name="AdditionalVolume_µL">
+                    <Float>0</Float>
+                </Parameter>
+                <Parameter name="TargetX_µm">
+                    <!-/- equals column 1 of 96 well plate  -/->
+                        <Int>14500</Int>
+                </Parameter>
+                <Parameter name="TargetY_µm">
+                    <!-/- equals row A of 96 well plate -/->
+                        <Int>11250</Int>
+                </Parameter>
+            </SiLADispensingStep>
+            <SiLADispensingStep>
+                <Parameter name="SourcePlateType">
+                    <String>S.100 Plate</String>
+                </Parameter>
+                <Parameter name="SourceRow">
+                    <Int>1</Int>
+                </Parameter>
+                <Parameter name="SourceColumn">
+                    <Int>2</Int>
+                </Parameter>
+                <Parameter name="LiquidClassName">
+                    <String>VSCY 0.95 (H2O, 1.0 mPa*s)</String>
+                </Parameter>
+                <Parameter name="Volume_µL">
+                    <Float>0.2</Float>
+                </Parameter>
+                <Parameter name="AdditionalVolume_µL">
+                    <Float>0</Float>
+                </Parameter>
+                <Parameter name="TargetX_µm">
+                    <!-/- equals column 2 of 96 well plate  -/->
+                        <Int>29000</Int>
+                </Parameter>
+                <Parameter name="TargetY_µm">
+                    <!-/- equals row B of 96 well plate -/->
+                        <Int>22500</Int>
+                </Parameter>
+            </SiLADispensingStep>
+        </ArrayOfSiLADispensingStep>
+        -->
 
         SourcePlateType: Source plate used on the I.DOT. Currently valid values are S_60 (S.60 Plate), S_100 (S.100 Plate), S_200 (S.200 Plate),
         L_100 (L.100 Plate), HT_60 (HT.60 Plate)
@@ -197,32 +186,31 @@
     <Response>
       <Identifier>TransferLiquidResult</Identifier>
       <DisplayName>Transfer Liquid Result</DisplayName>
-      <Description>
-        All The Data In XML Format Produced After A Dispensing Execution From TransferLiquid Command.
+      <Description>All The Data In XML Format Produced After A Dispensing Execution From TransferLiquid Command.
         schema look like below:
         <!--
-					<?xml version="1.0" encoding="utf-16" standalone="no"?> 
-							<ArrayOfDispensingResult xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"> 
+            <?xml version="1.0" encoding="utf-16" standalone="no"?> 
+                    <ArrayOfDispensingResult xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"> 
     							<DispensingResult> 
-        						<Step>1</Step> 
+                        <Step>1</Step> 
         							<TargetDrop>3</TargetDrop> 
         							<DetectedDrop>3</DetectedDrop> 
         							<Timestamp>2024-04-23T15:06:53.3815922+07:00</Timestamp> 
     							</DispensingResult> 
     							<DispensingResult> 
-        						<Step>2</Step> 
+                        <Step>2</Step> 
         							<TargetDrop>5</TargetDrop> 
         							<DetectedDrop>5</DetectedDrop> 
         							<Timestamp>2024-04-23T15:06:54.9375445+07:00</Timestamp> 
  									</DispensingResult> 
-									<DispensingResult> 
-        						<Step>3</Step> 
+                            <DispensingResult> 
+                        <Step>3</Step> 
         							<TargetDrop>4</TargetDrop> 
         							<DetectedDrop>4</DetectedDrop> 
         							<Timestamp>2024-04-23T15:06:55.9375445+07:00</Timestamp> 
     							</DispensingResult> 
-							</ArrayOfDispensingResult> 
-				-->
+                    </ArrayOfDispensingResult> 
+        -->
       </Description>
       <DataType>
         <Basic>String</Basic>
@@ -265,29 +253,29 @@
         <!--
 <?xml version="1.0" encoding="utf-8"?>
 <FillVolumeSchema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-	<SourcePlateType>
-		<String>S.100 Plate</String>
-	</SourcePlateType>
-	<ArrayOfFillVolumes>
-		<FillVolume>
-			<FillVolumeParameter Name="LiquidName">
-				<String>Water</String>
-			</FillVolumeParameter>
-			<FillVolumeParameter Name="FillVolume_µL">
-				<Int>10</Int>
-			</FillVolumeParameter>
-		</FillVolume>
-		<FillVolume>
-			<FillVolumeParameter Name="LiquidName">
-				<String>DMSO</String>
-			</FillVolumeParameter>
-			<FillVolumeParameter Name="FillVolume_µL">
-				<Int>10</Int>
-			</FillVolumeParameter>
-		</FillVolume>
-	</ArrayOfFillVolumes>
+<SourcePlateType>
+<String>S.100 Plate</String>
+</SourcePlateType>
+<ArrayOfFillVolumes>
+<FillVolume>
+    <FillVolumeParameter Name="LiquidName">
+        <String>Water</String>
+    </FillVolumeParameter>
+    <FillVolumeParameter Name="FillVolume_µL">
+        <Int>10</Int>
+    </FillVolumeParameter>
+</FillVolume>
+<FillVolume>
+    <FillVolumeParameter Name="LiquidName">
+        <String>DMSO</String>
+    </FillVolumeParameter>
+    <FillVolumeParameter Name="FillVolume_µL">
+        <Int>10</Int>
+    </FillVolumeParameter>
+</FillVolume>
+</ArrayOfFillVolumes>
 </FillVolumeSchema>
-				-->
+        -->
       </Description>
       <DataType>
         <Basic>String</Basic>

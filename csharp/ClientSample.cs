@@ -63,8 +63,7 @@ public class ClientSample
         }
 
         // Initialize device and execute sample protocol
-
-        InitIDotDevice(false).Wait();
+        InitIDotDevice(true).Wait();
         int i = 1;
         while(true)
         { 
@@ -72,9 +71,9 @@ public class ClientSample
             OpenTray("Source").Wait();
             OpenTray("Target").Wait();
             CloseTray().Wait();
-            DispenseProtocol(filePath, true).Wait();
+            DispenseProtocol(filePath, false).Wait();
             CheckStatus("Idle");
-            i = i + 1;
+            i += 1;
         }
     }
 
@@ -184,7 +183,7 @@ public class ClientSample
             }
 
             Console.ForegroundColor = ConsoleColor.DarkMagenta;
-            Console.WriteLine($"current I.DOT state {instrumentStatus}.");
+            Console.WriteLine($"current I.DOT state {instrumentStatus.InstrumentStatus.Value}.");
             Console.WriteLine($"I.DOT to execute a protocol  should be in the {expectedStatus} state.");
             Thread.Sleep(100);
 
@@ -243,7 +242,7 @@ public class ClientSample
     /// Dispense a CSV protcol
     /// </summary>
     /// <param name="filePath">CSV protocol file path. This file should exist on the server side</param>
-    public async Task DispenseProtocol(string filePath, bool stressTestDispensing)
+    public async Task DispenseProtocol(string filePath, bool monitorByPooling)
     {
         try
         {
@@ -253,37 +252,12 @@ public class ClientSample
             CommandExecutionUUID? commandID = _dispensingServiceClient
                                               .DispenseProtocol(new DispensingService.DispenseProtocol_Parameters()
                                               {
-                                                  FileNamePath = new Sila2.Org.Silastandard.String() { Value = filePath },
-                                                  MonitorDispenseProgress = new Boolean() {Value = !stressTestDispensing }
+                                                  FileNamePath = new Sila2.Org.Silastandard.String() { Value = filePath }
                                               })
                                               .CommandExecutionUUID;
 
             // Wait for command execution to finish if not for series of back to back dispensing
-            if (!stressTestDispensing)
-            {
-                using (AsyncServerStreamingCall<ExecutionInfo>? call = _dispensingServiceClient.DispenseProtocol_Info(commandID))
-                {
-                    IAsyncStreamReader<ExecutionInfo>? responseStream = call.ResponseStream;
-                    var cancellationToken = new CancellationTokenSource();
-
-                    while (await responseStream.MoveNext(cancellationToken.Token))
-                    {
-                        // Query the dispense progress status and display it in the console
-                        ExecutionInfo? currentExecutionInfo = responseStream.Current;
-                        string? message =
-                            $"--> Command DispenseProtocol    -status: {currentExecutionInfo.CommandStatus}   -remaining time: {currentExecutionInfo.EstimatedRemainingTime?.Seconds,3:###}s    -progress: {currentExecutionInfo.ProgressInfo.Value}";
-                        Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                        //Console.WriteLine(message);
-
-                        if (currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedSuccessfully ||
-                            currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedWithError)
-                        {
-                            break;
-                        }
-                    }
-                }
-            }
-            else
+            if (monitorByPooling)
             {
                 // wait for the server to execute first
                 Console.Write("wait for the server to execute first");
@@ -300,11 +274,35 @@ public class ClientSample
 
                 CheckStatus("Busy");
             }
+            else
+            {
+                using (AsyncServerStreamingCall<ExecutionInfo>? call = _dispensingServiceClient.DispenseProtocol_Info(commandID))
+                {
+                    IAsyncStreamReader<ExecutionInfo>? responseStream = call.ResponseStream;
+                    var cancellationToken = new CancellationTokenSource();
+
+                    while (await responseStream.MoveNext(cancellationToken.Token))
+                    {
+                        // Query the dispense progress status and display it in the console
+                        ExecutionInfo? currentExecutionInfo = responseStream.Current;
+                        string? message =
+                            $"--> Command DispenseProtocol    -status: {currentExecutionInfo.CommandStatus}   -remaining time: {currentExecutionInfo.EstimatedRemainingTime?.Seconds,3:###}s    -progress: {currentExecutionInfo.ProgressInfo.Value}";
+                        Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                        Console.WriteLine(message);
+
+                        if (currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedSuccessfully ||
+                            currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedWithError)
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
 
             var result = _dispensingServiceClient.DispenseProtocol_Result(commandID);
             if (result != null)
             {
-                Console.WriteLine(result.DispenseProtocolResult);
+                Console.WriteLine(result.DispenseProtocolResult.Value);
             }
         }
         catch (Exception e)
