@@ -1,4 +1,4 @@
-﻿using Grpc.Core;
+using Grpc.Core;
 using Grpc.Net.Client;
 using Microsoft.Extensions.Configuration;
 using Sila2.Org.Silastandard;
@@ -14,9 +14,10 @@ using SiLAService = Sila2.Org.Silastandard.Core.Silaservice.V1;
 
 using Boolean = Sila2.Org.Silastandard.Boolean;
 using Microsoft.Extensions.DependencyInjection;
-using Sila2.Org.Silastandard.Core.Errorrecoveryservice.V1;
+using Sila2.Org.Silastandard.Core.Errorrecoveryservice.V2;
 using SiLA2.Server.Utils;
 using String = Sila2.Org.Silastandard.String;
+using Sila2.Dx.Idot.Sila.Dispensing.Platetraycontroller.V1;
 
 public class ClientSample
 {
@@ -63,63 +64,17 @@ public class ClientSample
 
         // Initialize device and execute sample protocol
         InitIDotDevice(true).Wait();
-        DispenseProtocol(filePath).Wait();
-        
-        // Uncomment the following lines to execute the SetFillVolume and TransferLiquid commands
-//           string fillVolumeXML = @"<?xml version=""1.0"" encoding=""utf-8""?>
-// <FillVolumeSchema xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
-//     <SourcePlateType>
-//         <String>S.100 Plate</String>
-//     </SourcePlateType>
-//     <ArrayOfFillVolumes>
-//         <FillVolume>
-//             <FillVolumeParameter Name=""LiquidName"">
-//                 <String>DMSO</String>
-//             </FillVolumeParameter>
-//             <FillVolumeParameter Name=""FillVolume_µL"">
-//                 <Float>80</Float>
-//             </FillVolumeParameter>
-//         </FillVolume>
-//     </ArrayOfFillVolumes>
-// </FillVolumeSchema>";
-//
-//          string transferLiquidXML = @"<?xml version=""1.0"" encoding=""utf-8""?>
-// <ArrayOfSiLADispensingStep xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
-// 	<SiLADispensingStep>
-// 		<Parameter name=""SourcePlateType"">
-// 			<String>S.100 Plate</String>
-// 		</Parameter>
-// 		<Parameter name=""SourceRow"">
-// 			<Int>0</Int>
-// 		</Parameter>
-// 		<Parameter name=""SourceColumn"">
-// 			<Int>0</Int>
-// 		</Parameter>
-// 		<Parameter name=""LiquidClassName"">
-// 			<String>DMSO</String>
-// 		</Parameter>
-// 		<Parameter name=""LiquidName"">
-// 			<String>DMSO</String>
-// 		</Parameter>
-// 		<Parameter name=""Volume_µL"">
-// 			<Float>0.03526</Float>
-// 		</Parameter>
-// 		<Parameter name=""AdditionalVolume_µL"">
-// 			<Int>0</Int>
-// 		</Parameter>
-// 		<Parameter name=""TargetX_µm"">
-// 			<!-- equals column 1 of 96 well plate  -->
-// 			<Int>14500</Int>
-// 		</Parameter>
-// 		<Parameter name=""TargetY_µm"">
-// 			<!-- equals row A of 96 well plate -->
-// 			<Int>11250</Int>
-// 		</Parameter>
-// 	</SiLADispensingStep>
-// </ArrayOfSiLADispensingStep>
-// ";
-//          SetFillVolume(fillVolumeXML).Wait();
-//          TransferLiquid(transferLiquidXML, false).Wait();
+        int i = 1;
+        while(true)
+        { 
+            Console.WriteLine("******************************************Executing   " + i +   "*************************************************************");
+            OpenTray("Source").Wait();
+            OpenTray("Target").Wait();
+            CloseTray().Wait();
+            DispenseProtocol(filePath, false).Wait();
+            CheckStatus("Idle");
+            i += 1;
+        }
     }
 
     /// <summary>
@@ -144,11 +99,11 @@ public class ClientSample
         var serverMap = await clientSetup.SearchForServers();
 
         var serverType = "IDot SiLA2 Server";
-        var server = serverMap.Values.FirstOrDefault(x => x.Info.Type == serverType);
+        var server = serverMap.Values.FirstOrDefault(x => x.ServerType == serverType);
         if (server != null)
         {
             Console.WriteLine($"Connecting to {server}");
-            serverChannel = server.Channel;
+            serverChannel = await clientSetup.GetChannel(server.Address, server.Port, acceptAnyServerCertificate: true);
         }
         else
         {
@@ -182,24 +137,96 @@ public class ClientSample
     /// </summary>
     /// <param name="simulationMod">Switch server to the simulation mod</param>
     /// <returns></returns>
-    public async Task InitIDotDevice(bool simulationMod = true)
+    public async Task InitIDotDevice(bool simulationMod = false)
     {
         try
         {
             CommandConfirmation? commandReset =
-                _initializationControllerClient.Reset(new InitializationController.Reset_Parameters { SimulationMode = new Boolean { Value = simulationMod } });
+                _initializationControllerClient.Reset(new InitializationController.Reset_Parameters
+                    { SimulationMode = new Boolean { Value = simulationMod } });
 
-            using (AsyncServerStreamingCall<ExecutionInfo>? call = _initializationControllerClient.Reset_Info(commandReset.CommandExecutionUUID))
+            using (AsyncServerStreamingCall<ExecutionInfo>? call =
+                   _initializationControllerClient.Reset_Info(commandReset.CommandExecutionUUID))
             {
                 await WaitForExecutionCommend(call);
                 _initializationControllerClient.Reset_Result(commandReset.CommandExecutionUUID);
             }
 
-            CommandConfirmation? commandInitialize = _initializationControllerClient.Initialize(new InitializationController.Initialize_Parameters());
-            using (AsyncServerStreamingCall<ExecutionInfo>? call = _initializationControllerClient.Initialize_Info(commandInitialize.CommandExecutionUUID))
+            CommandConfirmation? commandInitialize =
+                _initializationControllerClient.Initialize(new InitializationController.Initialize_Parameters());
+            using (AsyncServerStreamingCall<ExecutionInfo>? call =
+                   _initializationControllerClient.Initialize_Info(commandInitialize.CommandExecutionUUID))
             {
                 await WaitForExecutionCommend(call);
                 _initializationControllerClient.Initialize_Result(commandInitialize.CommandExecutionUUID);
+            }
+        }
+        catch (Exception e)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            string error = ErrorHandling.HandleException(e);
+            Console.WriteLine(error);
+            throw;
+        }
+    }
+
+    private void CheckStatus(string expectedStatus)
+    {
+        var instrumentStatus =
+            _instrumentStatusProviderClient.Get_InstrumentStatus(new Instrumentstatusprovider.Get_InstrumentStatus_Parameters());
+        var ready = false;
+        while (!ready)
+        {
+            if (instrumentStatus.InstrumentStatus.Value == expectedStatus)
+            {
+                break;
+            }
+
+            Console.ForegroundColor = ConsoleColor.DarkMagenta;
+            Console.WriteLine($"current I.DOT state {instrumentStatus.InstrumentStatus.Value}.");
+            Console.WriteLine($"I.DOT to execute a protocol  should be in the {expectedStatus} state.");
+            Thread.Sleep(100);
+
+            ready = true;
+        }
+    }
+
+    public async Task OpenTray(string plateType)
+    {
+        try
+        {
+            CheckStatus("Idle");
+            
+            var parameters = new EjectTray_Parameters() { PlateTray= new PlateLoadingController.DataType_TrayType() { TrayType = new String() { Value = plateType } } };       
+
+            CommandConfirmation? commandEject = _plateTrayControllerClient.EjectTray(parameters);
+
+            using (AsyncServerStreamingCall<ExecutionInfo>? call = _plateTrayControllerClient.EjectTray_Info(commandEject.CommandExecutionUUID))
+            {
+                await WaitForExecutionCommend(call);
+                _plateTrayControllerClient.EjectTray_Result(commandEject.CommandExecutionUUID);
+            }
+        }
+        catch (Exception e)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            string error = ErrorHandling.HandleException(e);
+            Console.WriteLine(error);
+            throw;
+        }
+    }
+    public async Task CloseTray()
+    {
+        try
+        {
+            CheckStatus("Idle");
+            
+            CommandConfirmation? commandRetract = _plateTrayControllerClient.RetractTrays(new RetractTrays_Parameters());
+
+            using (AsyncServerStreamingCall<ExecutionInfo>? call = _plateTrayControllerClient.RetractTrays_Info(commandRetract.CommandExecutionUUID))
+            {
+                await WaitForExecutionCommend(call);
+                _plateTrayControllerClient.RetractTrays_Result(commandRetract.CommandExecutionUUID);
             }
         }
         catch (Exception e)
@@ -215,18 +242,11 @@ public class ClientSample
     /// Dispense a CSV protcol
     /// </summary>
     /// <param name="filePath">CSV protocol file path. This file should exist on the server side</param>
-    public async Task DispenseProtocol(string filePath)
+    public async Task DispenseProtocol(string filePath, bool monitorByPooling)
     {
         try
         {
-            var instrumentStatus =
-                _instrumentStatusProviderClient.Get_InstrumentStatus(new Instrumentstatusprovider.Get_InstrumentStatus_Parameters());
-            if (instrumentStatus.InstrumentStatus.Value != "Idle")
-            {
-                Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                Console.WriteLine("I.DOT to execute a protocol  should be in the Idle state.");
-                return;
-            }
+            CheckStatus("Idle");
 
             //This command runs asynchronously. To query the result or get the execution status you can use the return Command Execution UUID
             CommandExecutionUUID? commandID = _dispensingServiceClient
@@ -236,30 +256,54 @@ public class ClientSample
                                               })
                                               .CommandExecutionUUID;
 
-            // Wait for command execution to finish
-            using (AsyncServerStreamingCall<ExecutionInfo>? call = _dispensingServiceClient.DispenseProtocol_Info(commandID))
+            // Wait for command execution to finish if not for series of back to back dispensing
+            if (monitorByPooling)
             {
-                IAsyncStreamReader<ExecutionInfo>? responseStream = call.ResponseStream;
-                var cancellationToken = new CancellationTokenSource();
+                // wait for the server to execute first
+                Console.Write("wait for the server to execute first");
+                Thread.Sleep(5000);
 
-                while (await responseStream.MoveNext(cancellationToken.Token))
+                bool dispensingstatus = true;
+                while (dispensingstatus)
                 {
-                    // Query the dispense progress status and display it in the console
-                    ExecutionInfo? currentExecutionInfo = responseStream.Current;
-                    string? message =
-                        $"--> Command DispenseProtocol    -status: {currentExecutionInfo.CommandStatus}   -remaining time: {currentExecutionInfo.EstimatedRemainingTime?.Seconds,3:###}s    -progress: {currentExecutionInfo.ProgressInfo.Value}";
-                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                    Console.WriteLine(message);
+                    dispensingstatus = _dispensingServiceClient
+                        .Get_DispensingStatus(new DispensingService.Get_DispensingStatus_Parameters()).DispensingStatus
+                        .Value;
+                    Thread.Sleep(200);
+                }
 
-                    if (currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedSuccessfully ||
-                        currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedWithError)
+                CheckStatus("Busy");
+            }
+            else
+            {
+                using (AsyncServerStreamingCall<ExecutionInfo>? call = _dispensingServiceClient.DispenseProtocol_Info(commandID))
+                {
+                    IAsyncStreamReader<ExecutionInfo>? responseStream = call.ResponseStream;
+                    var cancellationToken = new CancellationTokenSource();
+
+                    while (await responseStream.MoveNext(cancellationToken.Token))
                     {
-                        break;
+                        // Query the dispense progress status and display it in the console
+                        ExecutionInfo? currentExecutionInfo = responseStream.Current;
+                        string? message =
+                            $"--> Command DispenseProtocol    -status: {currentExecutionInfo.CommandStatus}   -remaining time: {currentExecutionInfo.EstimatedRemainingTime?.Seconds,3:###}s    -progress: {currentExecutionInfo.ProgressInfo.Value}";
+                        Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                        Console.WriteLine(message);
+
+                        if (currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedSuccessfully ||
+                            currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedWithError)
+                        {
+                            break;
+                        }
                     }
                 }
             }
 
-            _dispensingServiceClient.DispenseProtocol_Result(commandID);
+            var result = _dispensingServiceClient.DispenseProtocol_Result(commandID);
+            if (result != null)
+            {
+                Console.WriteLine(result.DispenseProtocolResult.Value);
+            }
         }
         catch (Exception e)
         {
