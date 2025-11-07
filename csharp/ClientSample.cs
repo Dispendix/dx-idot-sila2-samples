@@ -166,6 +166,7 @@ public class ClientSample
             Console.ForegroundColor = ConsoleColor.DarkRed;
             string error = ErrorHandling.HandleException(e);
             Console.WriteLine(error);
+            Console.ResetColor();
             throw;
         }
     }
@@ -185,6 +186,7 @@ public class ClientSample
             Console.ForegroundColor = ConsoleColor.DarkMagenta;
             Console.WriteLine($"current I.DOT state {instrumentStatus.InstrumentStatus.Value}.");
             Console.WriteLine($"I.DOT to execute a protocol  should be in the {expectedStatus} state.");
+            Console.ResetColor();
             Thread.Sleep(100);
 
             ready = true;
@@ -212,9 +214,11 @@ public class ClientSample
             Console.ForegroundColor = ConsoleColor.DarkRed;
             string error = ErrorHandling.HandleException(e);
             Console.WriteLine(error);
+            Console.ResetColor();
             throw;
         }
     }
+
     public async Task CloseTray()
     {
         try
@@ -234,6 +238,7 @@ public class ClientSample
             Console.ForegroundColor = ConsoleColor.DarkRed;
             string error = ErrorHandling.HandleException(e);
             Console.WriteLine(error);
+            Console.ResetColor();
             throw;
         }
     }
@@ -289,6 +294,7 @@ public class ClientSample
                             $"--> Command DispenseProtocol    -status: {currentExecutionInfo.CommandStatus}   -remaining time: {currentExecutionInfo.EstimatedRemainingTime?.Seconds,3:###}s    -progress: {currentExecutionInfo.ProgressInfo.Value}";
                         Console.ForegroundColor = ConsoleColor.DarkMagenta;
                         Console.WriteLine(message);
+                        Console.ResetColor();
 
                         if (currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedSuccessfully ||
                             currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedWithError)
@@ -310,9 +316,10 @@ public class ClientSample
             Console.ForegroundColor = ConsoleColor.DarkRed;
             string error = ErrorHandling.HandleException(e);
             Console.WriteLine(error);
+            Console.ResetColor();
         }
     }
-    
+
     public async Task SetFillVolume(string xmlSchema)
     {
         try
@@ -323,9 +330,10 @@ public class ClientSample
             {
                 Console.ForegroundColor = ConsoleColor.DarkMagenta;
                 Console.WriteLine("I.DOT to execute a protocol  should be in the Idle state.");
+                Console.ResetColor();
                 return;
             }
-    
+
             //This command runs asynchronously. To query the result or get the execution status you can use the return Command Execution UUID
             CommandExecutionUUID? commandID = _dispensingServiceClient
                                               .SetFillVolume(new DispensingService.SetFillVolume_Parameters()
@@ -348,7 +356,8 @@ public class ClientSample
                         $"--> Command DispenseProtocol    -status: {currentExecutionInfo.CommandStatus}   -remaining time: {currentExecutionInfo.EstimatedRemainingTime?.Seconds,3:###}s    -progress: {currentExecutionInfo.ProgressInfo.Value}";
                     Console.ForegroundColor = ConsoleColor.DarkMagenta;
                     Console.WriteLine(message);
-    
+                    Console.ResetColor();
+
                     if (currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedSuccessfully ||
                         currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedWithError)
                     {
@@ -364,9 +373,9 @@ public class ClientSample
             Console.ForegroundColor = ConsoleColor.DarkRed;
             string error = ErrorHandling.HandleException(e);
             Console.WriteLine(error);
+            Console.ResetColor();
         }
     }
-    
 
     public async Task TransferLiquid(string dispenseXmlSchema, bool optimizeDispenseStepOrder)
     {
@@ -378,6 +387,7 @@ public class ClientSample
             {
                 Console.ForegroundColor = ConsoleColor.DarkMagenta;
                 Console.WriteLine("I.DOT to execute a protocol  should be in the Idle state.");
+                Console.ResetColor();
                 return;
             }
 
@@ -405,6 +415,7 @@ public class ClientSample
                         $"--> Command TransferLiquid   -status: {currentExecutionInfo.CommandStatus}   -remaining time: {currentExecutionInfo.EstimatedRemainingTime?.Seconds,3:###}s    -progress: {currentExecutionInfo.ProgressInfo.Value}";
                     Console.ForegroundColor = ConsoleColor.DarkMagenta;
                     Console.WriteLine(message);
+                    Console.ResetColor();
 
                     if (currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedSuccessfully ||
                         currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedWithError)
@@ -423,8 +434,8 @@ public class ClientSample
             Console.ForegroundColor = ConsoleColor.DarkRed;
             string error = ErrorHandling.HandleException(e);
             Console.WriteLine(error);
+            Console.ResetColor();
             Console.WriteLine("\n");
         }
     }
-
 }
