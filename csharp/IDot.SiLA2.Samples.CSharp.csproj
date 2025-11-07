@@ -44,13 +44,13 @@
   <Target Name="ProtoGeneration" DependsOnTargets="ProtoPreparation" AfterTargets="ProtoPreparation">
     <Message Text="Compiling Protos..." Importance="high"></Message>
     <ItemGroup>
-      <Protobuf Include="Protos\AbortProcessController.proto" ProtoRoot="Protos\" GrpcServices="Both" OutputDir="Services\" />
-      <Protobuf Include="Protos\BarcodeReaderService.proto" ProtoRoot="Protos\" GrpcServices="Both" OutputDir="Services\" />
-      <Protobuf Include="Protos\DispensingService.proto" ProtoRoot="Protos\" GrpcServices="Both" OutputDir="Services\" />
-      <Protobuf Include="Protos\InitializationController.proto" ProtoRoot="Protos\" GrpcServices="Both" OutputDir="Services\" />
-      <Protobuf Include="Protos\InstrumentStatusProvider.proto" ProtoRoot="Protos\" GrpcServices="Both" OutputDir="Services\" />
-      <Protobuf Include="Protos\PlateTrayController.proto" ProtoRoot="Protos\" GrpcServices="Both" OutputDir="Services\" />
-      <Protobuf Include="Protos\ShutdownController.proto" ProtoRoot="Protos\" GrpcServices="Both" OutputDir="Services\" />
+      <Protobuf Include="Protos\AbortProcessController.proto" ProtoRoot="Protos\" GrpcServices="Both" />
+      <Protobuf Include="Protos\BarcodeReaderService.proto" ProtoRoot="Protos\" GrpcServices="Both" />
+      <Protobuf Include="Protos\DispensingService.proto" ProtoRoot="Protos\" GrpcServices="Both" />
+      <Protobuf Include="Protos\InitializationController.proto" ProtoRoot="Protos\" GrpcServices="Both" />
+      <Protobuf Include="Protos\InstrumentStatusProvider.proto" ProtoRoot="Protos\" GrpcServices="Both" />
+      <Protobuf Include="Protos\PlateTrayController.proto" ProtoRoot="Protos\" GrpcServices="Both" />
+      <Protobuf Include="Protos\ShutdownController.proto" ProtoRoot="Protos\" GrpcServices="Both" />
     </ItemGroup>
   </Target>
 
