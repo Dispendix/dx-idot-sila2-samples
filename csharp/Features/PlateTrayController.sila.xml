@@ -9,10 +9,10 @@
 	<Identifier>PlateTrayController</Identifier>
 	<DisplayName>Plate Tray Controller</DisplayName>
 	<Description>
-		Controller to eject and retract both the source and target tray. This service is needed to input the respective
-		target and source plates before dispensing. Please note that canceling a command of this controller in the middle of execution
-		can cause the carrier to half eject or half retract. The Dispense Service Feature requires all trays to be fully retracted to
-		avoid any harm to the I.DOT.
+		Controller to eject and retract both the source and target tray.
+        This service is needed to input the respective target and source plates before dispensing.
+        Please note that canceling a command of this controller in the middle of execution can cause the carrier to half eject or half retract.
+        The Dispense Service Feature requires all trays to be fully retracted to avoid any harm to the I.DOT.
 	</Description>
 	<Command>
 		<Identifier>EjectTray</Identifier>
