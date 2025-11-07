@@ -78,8 +78,4 @@
 		<PackageReference Include="SiLA2.Utils" Version="7.5.4" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Services\" />
-	</ItemGroup>
-
 </Project>
