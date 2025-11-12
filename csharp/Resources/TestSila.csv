@@ -3,11 +3,11 @@ Step17_EE,2.2.0.29,<User Name>,05/08/2024,14:30
 DispenseToWaste=True,DispenseToWasteCycles=3,DispenseToWasteVolume=1e-7,UseDeionisation=True,OptimizationLevel=ReorderAndParallel,WasteErrorHandlingLevel=Ask,SaveLiquids=Ask
 
 Target Plate,Target Plate Type,Target Plate Barcode,Target Well,Waste Well,Source Plate,Source Plate Type,Source Plate Barcode,Source Well,Volume [uL],Liquid Name,Additional Volume Per Source Well
-Target Plate 1,96-Well,,A01,Waste Tube,Source Plate 1,S.100 Plate,,A01,6.1538462,Water,0e0
-Target Plate 1,96-Well,,A01,Waste Tube,Source Plate 1,S.100 Plate,,B01,5.5172414,Water,0e0
-Target Plate 1,96-Well,,B01,Waste Tube,Source Plate 1,S.100 Plate,,A02,6.1538462,Water,0e0
-Target Plate 1,96-Well,,B01,Waste Tube,Source Plate 1,S.100 Plate,,B02,5.5172414,Water,0e0
-Target Plate 1,96-Well,,A01,Waste Tube,Source Plate 1,S.100 Plate,,C01,6.1538462,Water,0e0
-Target Plate 1,96-Well,,A01,Waste Tube,Source Plate 1,S.100 Plate,,D01,5.5172414,Water,0e0
-Target Plate 1,96-Well,,B01,Waste Tube,Source Plate 1,S.100 Plate,,C02,6.1538462,Water,0e0
-Target Plate 1,96-Well,,B01,Waste Tube,Source Plate 1,S.100 Plate,,D02,5.5172414,Water,0e0
+Target Plate 1,96-Well,,A01,Waste Tube,Source Plate 1,S.100 Plate,,A01,6.153,Water,0e0
+Target Plate 1,96-Well,,A01,Waste Tube,Source Plate 1,S.100 Plate,,B01,5.517,Water,0e0
+Target Plate 1,96-Well,,B01,Waste Tube,Source Plate 1,S.100 Plate,,A02,6.153,Water,0e0
+Target Plate 1,96-Well,,B01,Waste Tube,Source Plate 1,S.100 Plate,,B02,5.517,Water,0e0
+Target Plate 1,96-Well,,A01,Waste Tube,Source Plate 1,S.100 Plate,,C01,6.153,Water,0e0
+Target Plate 1,96-Well,,A01,Waste Tube,Source Plate 1,S.100 Plate,,D01,5.517,Water,0e0
+Target Plate 1,96-Well,,B01,Waste Tube,Source Plate 1,S.100 Plate,,C02,6.153,Water,0e0
+Target Plate 1,96-Well,,B01,Waste Tube,Source Plate 1,S.100 Plate,,D02,5.517,Water,0e0

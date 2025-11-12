@@ -337,7 +337,8 @@ public class ClientSample
                 Console.WriteLine("Drop Detection Result: Some drops were missed during dispensing.");
                 foreach (var misedDrop in misedDrops)
                 {
-                    Console.WriteLine($"{misedDrop.DropDetectionResult.SourceWell.Value} => {misedDrop.DropDetectionResult.TargetWell.Value}: {misedDrop.DropDetectionResult.DetectedDropCount.Value} / {misedDrop.DropDetectionResult.TargetDropCount.Value} drops detected.");
+                    var ddResult = misedDrop.DropDetectionResult;
+                    Console.WriteLine($"{ddResult.SourceWell.Value} => {ddResult.TargetWell.Value}: {ddResult.DetectedVolume.Value}nL / {ddResult.TargetVolume.Value}nL ({ddResult.DetectedDropCount.Value} / {ddResult.TargetDropCount.Value} drops).");
                 }
             }
             else
