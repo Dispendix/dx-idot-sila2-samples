@@ -113,6 +113,9 @@ _NCrunch_*
 *.mm.*
 AutoTest.Net/
 
+# JetBrains IDEs
+.idea/
+
 # Web workbench (sass)
 .sass-cache/
 

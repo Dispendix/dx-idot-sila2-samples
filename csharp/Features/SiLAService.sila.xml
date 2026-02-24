@@ -8,8 +8,7 @@
   <Description>
     This Feature MUST be implemented by each SiLA Server.
 
-    It specifies Commands and Properties to discover the Features a SiLA Server implements as well as details
-    about the SiLA Server, like name, type, description, vendor and UUID.
+    It specifies Commands and Properties to discover the Features a SiLA Server implements as well as details about the SiLA Server, like name, type, description, vendor and UUID.
 
     Any interaction described in this feature MUST not affect the behaviour of any other Feature.
   </Description>

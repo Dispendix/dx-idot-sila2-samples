@@ -11,7 +11,6 @@ using Instrumentstatusprovider = Sila2.Dx.Idot.Sila.Dispensing.Instrumentstatusp
 using PlateLoadingController = Sila2.Dx.Idot.Sila.Dispensing.Platetraycontroller.V1;
 using ShutdownController = Sila2.Dx.Idot.Sila.Dispensing.Shutdowncontroller.V1;
 using SiLAService = Sila2.Org.Silastandard.Core.Silaservice.V1;
-
 using Boolean = Sila2.Org.Silastandard.Boolean;
 using Microsoft.Extensions.DependencyInjection;
 using Sila2.Org.Silastandard.Core.Errorrecoveryservice.V2;
@@ -31,7 +30,7 @@ public class ClientSample
     private readonly ShutdownController.ShutdownController.ShutdownControllerClient _shutdownControllerClient;
     private readonly ErrorRecoveryService.ErrorRecoveryServiceClient _errorRecoveryClient;
     private readonly SiLAService.SiLAService.SiLAServiceClient _siLAServiceClient;
-    private static IConfigurationRoot _configuration;
+    private static IConfigurationRoot? _configuration;
 
     public ClientSample()
     {
@@ -58,21 +57,22 @@ public class ClientSample
         }
         catch (Exception e)
         {
-            Console.WriteLine("I.DOT SiLA2 client sample can not connect to the I.DOT SiLA2 server.");
+            Console.WriteLine("I.DOT SiLA2 client sample can not connect to the I.DOT SiLA2 server: " + e.Message);
             return;
         }
 
         // Initialize device and execute sample protocol
         InitIDotDevice(true).Wait();
         int i = 1;
-        while(true)
-        { 
-            Console.WriteLine("******************************************Executing   " + i +   "*************************************************************");
+        while (true)
+        {
+            Console.WriteLine("******************************************Executing   " + i + "*************************************************************");
             OpenTray("Source").Wait();
             OpenTray("Target").Wait();
             CloseTray().Wait();
             DispenseProtocol(filePath, false).Wait();
             CheckStatus("Idle");
+            DropDetectionResult();
             i += 1;
         }
     }
@@ -87,13 +87,13 @@ public class ClientSample
         GrpcChannel serverChannel;
 
         IConfigurationBuilder? configBuilder = new ConfigurationBuilder()
-                                               .SetBasePath(Directory.GetCurrentDirectory())
-                                               .AddJsonFile("appsettings.json", true, true);
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", true, true);
         _configuration = configBuilder.Build();
         string? fqhn = _configuration["Connection:FQHN"];
-        int port = int.Parse(_configuration["Connection:Port"]);
+        int port = _configuration.GetValue<int>("Connection:Port");
 
-        var clientSetup = new SiLA2.Client.Configurator(_configuration, new string[] {});
+        var clientSetup = new SiLA2.Client.Configurator(_configuration, new string[] { });
         Console.WriteLine("Starting Server Discovery...");
 
         var serverMap = await clientSetup.SearchForServers();
@@ -166,6 +166,7 @@ public class ClientSample
             Console.ForegroundColor = ConsoleColor.DarkRed;
             string error = ErrorHandling.HandleException(e);
             Console.WriteLine(error);
+            Console.ResetColor();
             throw;
         }
     }
@@ -185,6 +186,7 @@ public class ClientSample
             Console.ForegroundColor = ConsoleColor.DarkMagenta;
             Console.WriteLine($"current I.DOT state {instrumentStatus.InstrumentStatus.Value}.");
             Console.WriteLine($"I.DOT to execute a protocol  should be in the {expectedStatus} state.");
+            Console.ResetColor();
             Thread.Sleep(100);
 
             ready = true;
@@ -196,8 +198,8 @@ public class ClientSample
         try
         {
             CheckStatus("Idle");
-            
-            var parameters = new EjectTray_Parameters() { PlateTray= new PlateLoadingController.DataType_TrayType() { TrayType = new String() { Value = plateType } } };       
+
+            var parameters = new EjectTray_Parameters() { PlateTray = new PlateLoadingController.DataType_TrayType() { TrayType = new String() { Value = plateType } } };
 
             CommandConfirmation? commandEject = _plateTrayControllerClient.EjectTray(parameters);
 
@@ -212,15 +214,17 @@ public class ClientSample
             Console.ForegroundColor = ConsoleColor.DarkRed;
             string error = ErrorHandling.HandleException(e);
             Console.WriteLine(error);
+            Console.ResetColor();
             throw;
         }
     }
+
     public async Task CloseTray()
     {
         try
         {
             CheckStatus("Idle");
-            
+
             CommandConfirmation? commandRetract = _plateTrayControllerClient.RetractTrays(new RetractTrays_Parameters());
 
             using (AsyncServerStreamingCall<ExecutionInfo>? call = _plateTrayControllerClient.RetractTrays_Info(commandRetract.CommandExecutionUUID))
@@ -234,6 +238,7 @@ public class ClientSample
             Console.ForegroundColor = ConsoleColor.DarkRed;
             string error = ErrorHandling.HandleException(e);
             Console.WriteLine(error);
+            Console.ResetColor();
             throw;
         }
     }
@@ -250,11 +255,11 @@ public class ClientSample
 
             //This command runs asynchronously. To query the result or get the execution status you can use the return Command Execution UUID
             CommandExecutionUUID? commandID = _dispensingServiceClient
-                                              .DispenseProtocol(new DispensingService.DispenseProtocol_Parameters()
-                                              {
-                                                  FileNamePath = new Sila2.Org.Silastandard.String() { Value = filePath }
-                                              })
-                                              .CommandExecutionUUID;
+                .DispenseProtocol(new DispensingService.DispenseProtocol_Parameters()
+                {
+                    FileNamePath = new Sila2.Org.Silastandard.String() { Value = filePath }
+                })
+                .CommandExecutionUUID;
 
             // Wait for command execution to finish if not for series of back to back dispensing
             if (monitorByPooling)
@@ -289,6 +294,7 @@ public class ClientSample
                             $"--> Command DispenseProtocol    -status: {currentExecutionInfo.CommandStatus}   -remaining time: {currentExecutionInfo.EstimatedRemainingTime?.Seconds,3:###}s    -progress: {currentExecutionInfo.ProgressInfo.Value}";
                         Console.ForegroundColor = ConsoleColor.DarkMagenta;
                         Console.WriteLine(message);
+                        Console.ResetColor();
 
                         if (currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedSuccessfully ||
                             currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedWithError)
@@ -310,9 +316,48 @@ public class ClientSample
             Console.ForegroundColor = ConsoleColor.DarkRed;
             string error = ErrorHandling.HandleException(e);
             Console.WriteLine(error);
+            Console.ResetColor();
         }
     }
-    
+
+    /// <summary>
+    /// Prints Drop Detection result to the console
+    /// </summary>
+    public void DropDetectionResult()
+    {
+        try
+        {
+            var result = _dispensingServiceClient.DropDetectionResult(new DispensingService.DropDetectionResult_Parameters());
+            var misedDrops = result.DropDetectionResults
+                .Where(res => res.DropDetectionResult.DetectedDropCount.Value != res.DropDetectionResult.TargetDropCount.Value)
+                .ToList();
+            if (misedDrops.Any())
+            {
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine("Drop Detection Result: Some drops were missed during dispensing.");
+                foreach (var misedDrop in misedDrops)
+                {
+                    var ddResult = misedDrop.DropDetectionResult;
+                    Console.WriteLine($"{ddResult.SourceWell.Value} => {ddResult.TargetWell.Value}: {ddResult.DetectedVolume.Value}nL / {ddResult.TargetVolume.Value}nL ({ddResult.DetectedDropCount.Value} / {ddResult.TargetDropCount.Value} drops).");
+                }
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                Console.WriteLine("Drop Detection Result: No missed drops detected.");
+            }
+
+            Console.ResetColor();
+        }
+        catch (Exception e)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            string error = ErrorHandling.HandleException(e);
+            Console.WriteLine(error);
+            Console.ResetColor();
+        }
+    }
+
     public async Task SetFillVolume(string xmlSchema)
     {
         try
@@ -323,23 +368,24 @@ public class ClientSample
             {
                 Console.ForegroundColor = ConsoleColor.DarkMagenta;
                 Console.WriteLine("I.DOT to execute a protocol  should be in the Idle state.");
+                Console.ResetColor();
                 return;
             }
-    
+
             //This command runs asynchronously. To query the result or get the execution status you can use the return Command Execution UUID
             CommandExecutionUUID? commandID = _dispensingServiceClient
-                                              .SetFillVolume(new DispensingService.SetFillVolume_Parameters()
-                                              {
-                                                 FillVolumes = new Sila2.Org.Silastandard.String() { Value = xmlSchema }
-                                              })
-                                              .CommandExecutionUUID;
-    
+                .SetFillVolume(new DispensingService.SetFillVolume_Parameters()
+                {
+                    FillVolumes = new Sila2.Org.Silastandard.String() { Value = xmlSchema }
+                })
+                .CommandExecutionUUID;
+
             // Wait for command execution to finish
             using (AsyncServerStreamingCall<ExecutionInfo>? call = _dispensingServiceClient.SetFillVolume_Info(commandID))
             {
                 IAsyncStreamReader<ExecutionInfo>? responseStream = call.ResponseStream;
                 var cancellationToken = new CancellationTokenSource();
-    
+
                 while (await responseStream.MoveNext(cancellationToken.Token))
                 {
                     // Query the dispense progress status and display it in the console
@@ -348,7 +394,8 @@ public class ClientSample
                         $"--> Command DispenseProtocol    -status: {currentExecutionInfo.CommandStatus}   -remaining time: {currentExecutionInfo.EstimatedRemainingTime?.Seconds,3:###}s    -progress: {currentExecutionInfo.ProgressInfo.Value}";
                     Console.ForegroundColor = ConsoleColor.DarkMagenta;
                     Console.WriteLine(message);
-    
+                    Console.ResetColor();
+
                     if (currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedSuccessfully ||
                         currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedWithError)
                     {
@@ -356,7 +403,7 @@ public class ClientSample
                     }
                 }
             }
-    
+
             _dispensingServiceClient.SetFillVolume_Result(commandID);
         }
         catch (Exception e)
@@ -364,13 +411,13 @@ public class ClientSample
             Console.ForegroundColor = ConsoleColor.DarkRed;
             string error = ErrorHandling.HandleException(e);
             Console.WriteLine(error);
+            Console.ResetColor();
         }
     }
-    
 
     public async Task TransferLiquid(string dispenseXmlSchema, bool optimizeDispenseStepOrder)
     {
-         try
+        try
         {
             var instrumentStatus =
                 _instrumentStatusProviderClient.Get_InstrumentStatus(new Instrumentstatusprovider.Get_InstrumentStatus_Parameters());
@@ -378,18 +425,19 @@ public class ClientSample
             {
                 Console.ForegroundColor = ConsoleColor.DarkMagenta;
                 Console.WriteLine("I.DOT to execute a protocol  should be in the Idle state.");
+                Console.ResetColor();
                 return;
             }
 
             //This command runs asynchronously. To query the result or get the execution status you can use the return Command Execution UUID
             CommandExecutionUUID? commandID = _dispensingServiceClient
-                                              .TransferLiquid(new DispensingService.TransferLiquid_Parameters()
-                                              {
-                                                  //FileNamePath = new Sila2.Org.Silastandard.String() { Value = filePath }
-                                                  DispenseStepXmlSchema = new String(){Value = dispenseXmlSchema},
-                                                  OptimizeDispenseStepOrder = new Boolean() { Value = optimizeDispenseStepOrder }
-                                              })
-                                              .CommandExecutionUUID;
+                .TransferLiquid(new DispensingService.TransferLiquid_Parameters()
+                {
+                    //FileNamePath = new Sila2.Org.Silastandard.String() { Value = filePath }
+                    DispenseStepXmlSchema = new String() { Value = dispenseXmlSchema },
+                    OptimizeDispenseStepOrder = new Boolean() { Value = optimizeDispenseStepOrder }
+                })
+                .CommandExecutionUUID;
 
             // Wait for command execution to finish
             using (AsyncServerStreamingCall<ExecutionInfo>? call = _dispensingServiceClient.TransferLiquid_Info(commandID))
@@ -405,6 +453,7 @@ public class ClientSample
                         $"--> Command TransferLiquid   -status: {currentExecutionInfo.CommandStatus}   -remaining time: {currentExecutionInfo.EstimatedRemainingTime?.Seconds,3:###}s    -progress: {currentExecutionInfo.ProgressInfo.Value}";
                     Console.ForegroundColor = ConsoleColor.DarkMagenta;
                     Console.WriteLine(message);
+                    Console.ResetColor();
 
                     if (currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedSuccessfully ||
                         currentExecutionInfo.CommandStatus == ExecutionInfo.Types.CommandStatus.FinishedWithError)
@@ -423,8 +472,8 @@ public class ClientSample
             Console.ForegroundColor = ConsoleColor.DarkRed;
             string error = ErrorHandling.HandleException(e);
             Console.WriteLine(error);
+            Console.ResetColor();
             Console.WriteLine("\n");
         }
     }
-
 }
