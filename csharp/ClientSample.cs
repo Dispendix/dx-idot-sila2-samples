@@ -30,7 +30,7 @@ public class ClientSample
     private readonly ShutdownController.ShutdownController.ShutdownControllerClient _shutdownControllerClient;
     private readonly ErrorRecoveryService.ErrorRecoveryServiceClient _errorRecoveryClient;
     private readonly SiLAService.SiLAService.SiLAServiceClient _siLAServiceClient;
-    private static IConfigurationRoot _configuration;
+    private static IConfigurationRoot? _configuration;
 
     public ClientSample()
     {
@@ -57,7 +57,7 @@ public class ClientSample
         }
         catch (Exception e)
         {
-            Console.WriteLine("I.DOT SiLA2 client sample can not connect to the I.DOT SiLA2 server.");
+            Console.WriteLine("I.DOT SiLA2 client sample can not connect to the I.DOT SiLA2 server: " + e.Message);
             return;
         }
 
@@ -91,7 +91,7 @@ public class ClientSample
             .AddJsonFile("appsettings.json", true, true);
         _configuration = configBuilder.Build();
         string? fqhn = _configuration["Connection:FQHN"];
-        int port = int.Parse(_configuration["Connection:Port"]);
+        int port = _configuration.GetValue<int>("Connection:Port");
 
         var clientSetup = new SiLA2.Client.Configurator(_configuration, new string[] { });
         Console.WriteLine("Starting Server Discovery...");
